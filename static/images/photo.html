@@ -1,0 +1,824 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <style>
+        html,body {
+            height:100%
+
+        }
+        .container{
+            width: 100px;
+            height: 100px;
+            margin: auto;
+            background: transparent url(images/LINE_sticker4319.png) no-repeat scroll -315px -350px;
+            /*margin-top: 30px;*/
+            /*border:5px solid green;*/
+        }
+        .mytxt {
+            width:300px;
+            height:50px;
+            color:#333;
+            line-height:normal;
+            font-family:"Microsoft YaHei",Tahoma,Verdana,SimSun;
+            font-style:normal;
+            font-variant:normal;
+            font-size-adjust:none;
+            font-stretch:normal;
+            font-weight:normal;
+            margin-top:0px;
+            margin-bottom:0px;
+            margin-left:0px;
+            padding-top:4px;
+            padding-right:4px;
+            padding-bottom:4px;
+            padding-left:4px;
+            font-size:15px;
+            outline-width:medium;
+            outline-style:none;
+            outline-color:invert;
+            border-top-left-radius:3px;
+            border-top-right-radius:3px;
+            border-bottom-left-radius:3px;
+            border-bottom-right-radius:3px;
+            text-shadow:0px 1px 2px #fff;
+            background-attachment:scroll;
+            background-repeat:repeat-x;
+            background-position-x:left;
+            background-position-y:top;
+            background-size:auto;
+            background-origin:padding-box;
+            background-clip:border-box;
+            background-color:rgb(255,255,255);
+            margin-right:8px;
+            margin-bottom:8px;
+            border-top-color:#ccc;
+            border-right-color:#ccc;
+            border-bottom-color:#ccc;
+            border-left-color:#ccc;
+            border-top-width:1px;
+            border-right-width:1px;
+            border-bottom-width:1px;
+            border-left-width:1px;
+            border-top-style:solid;
+            border-right-style:solid;
+            border-bottom-style:solid;
+            border-left-style:solid;
+        }
+        .mytxt:focus {
+             border: 1px solid #fafafa;
+             -webkit-box-shadow: 0px 0px 6px #007eff;
+             -moz-box-shadow: 0px 0px 5px #007eff;
+             box-shadow: 0px 0px 5px #007eff;
+        }
+        </style>
+
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript">
+
+        // 函数ID，清空定时函数用
+        var functionId;
+
+        var timer = 1500;
+
+        var totalTime = 0;
+
+        var CanvasMaker = function(canvas){
+            this.canvas = canvas;
+            // 函数ID，清空定时函数用
+            // this.functionId;
+        };
+
+        CanvasMaker.prototype = {
+            // 设置全屏画布
+            setFullScreen: function() {
+                setFullScreen(this.canvas);
+                return this;
+            },
+            // 取得当前画布按照size等分后的宽度
+            getAvgWidth: function(size, defaultMargin) {
+                return getAvgWidth(this.canvas, size, defaultMargin);
+            },
+            repeatImg: function(img, x, y) {
+                repeatImg(this.canvas, img, x, y);
+                return this;
+            }
+
+        };
+
+        function setFullScreen(canvas) {
+            // 设置全屏画布
+            $(window).resize(resizeCanvas);
+            function resizeCanvas() {
+                //浏览器窗口大小变化时，回调函数
+                $(canvas).attr("width", $(window).get(0).innerWidth);
+                $(canvas).attr("height", $(window).get(0).innerHeight);
+            };
+            resizeCanvas();
+        }
+
+        function getAvgWidth(canvas, size, defaultMargin) {
+            return Math.ceil((canvas.width - 2 * defaultMargin)/(size - 1));
+        }
+
+        function drawTopPage(canvas, totalTime, imgPathArray) {
+            // 得到2d效果内容
+            var ctx = canvas.getContext("2d");
+            // 设定图片描画相关信息
+            var baseptions = {
+                sx: 10,
+                sy: 10,
+                sWidth: 100,
+                sHeight: 100,
+                dx: (canvas.width-100)/2,
+                dy: (canvas.height-100)/2,
+                dWidth: 100,
+                dHeight: 90
+            };
+
+            // 取得图片
+            var image = $("#line1").get(0);
+
+            var avgWidth = getAvgWidth(canvas, imgPathArray.length, 10);
+            ctx.font = "bold 36px Times New Roman";
+            ctx.fillText("WE", 35, 60);
+
+            var tmpOptions = $.extend({}, baseptions,             
+                            {
+                                sx: 10,
+                                sy: 230,
+                                dx: 120,
+                                dy: 0
+                            });
+            var index = 1;
+            functionId = setInterval(function(){
+                  ctx.save();
+                  ctx.translate(165, 45);
+                  
+                  ctx.rotate((Math.PI*2/360) * index);
+                  ctx.translate(-50, -45);
+                  ctx.clearRect(0, 0, 100, 90); 
+                  ctx.drawImage(image, tmpOptions.sx, tmpOptions.sy, tmpOptions.sWidth, tmpOptions.sHeight, 0, 0, 100, 90);
+                  ctx.restore();
+                  index++;
+                  if (index > 360) {
+                    clearInterval(functionId);
+                    drawImage(ctx, image, imgPathArray);
+                  }
+              }, 10);
+
+            ctx.fillText("STORY", 230, 60);
+            // 动态切换图片
+            function drawImage(ctx, image, imgPathArray) {
+                for (var index = 0, photoLength = imgPathArray.length; index < photoLength; index++) {
+                    var tmpOptions = $.extend({}, baseptions, imgPathArray[index]);
+                    setTimeout((function(options, index) {
+                        return function () {
+                            // 当不是第一个图片时需要清理之前的图片,并将前一个图片移动到页面上部
+                            // if (index != 0) {
+                            //     var preIndex = index-1;
+                            //     ctx.clearRect(options.dx,options.dy,options.dWidth,options.dHeight); 
+                            //     var preOptions = $.extend({}, baseptions, imgPathArray[preIndex]);
+                            //     ctx.drawImage(image, preOptions.sx, preOptions.sy, preOptions.sWidth, preOptions.sHeight, 10 + avgWidth * preIndex, 10, options.dWidth > avgWidth ? avgWidth : options.dWidth, options.dHeight);
+                            // } 
+                            ctx.drawImage(image, options.sx, options.sy, options.sWidth, options.sHeight, options.dx, options.dy, options.dWidth, options.dHeight);
+                            // 当现在是最后一张图片时，选择放大图片
+                            // if (index == imgPathArray.length - 1) {
+                            //     toBigDraw(ctx, image, options);
+                            // }
+                        }
+                    })(tmpOptions, index), timer*index);
+                }
+            }
+
+            totalTime += timer * imgPathArray.length;
+            return totalTime;
+        }
+
+        function toBigDraw(ctx, image, options) {
+            var dWidth = options.dWidth,
+                dHeight = options.dHeight,
+                dx = options.dx,
+                dy = options.dy;
+
+            functionId = this.setInterval(function(){
+                dWidth = dWidth + 5;
+                dHeight = dHeight + 5;
+                dx = dx - 5;
+                dy = dy - 5;
+                ctx.drawImage(image, options.sx, options.sy, options.sWidth, options.sHeight, dx, dy, dWidth, dHeight);
+                if (dWidth > options.sWidth * 2 || dHeight > options.sHeight * 2) {
+                    window.clearInterval(functionId);
+                }
+            }, 50);
+        }
+
+        function toSmallDraw(ctx, image, options) {
+            var dWidth = options.dWidth,
+                preDWidth = dWidth,
+                dHeight = options.dHeight,
+                dx = options.dx,
+                dy = options.dy;
+
+            functionId = this.setInterval(function(){
+                ctx.clearRect(0,0,preDWidth, image.height);
+                // dWidth = dWidth - 50;
+                ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, dWidth, image.height);
+                preDWidth = dWidth;
+                if (dWidth == image.width) {
+                    window.clearInterval(functionId);
+                } else if (dWidth > image.width) {
+                    dWidth = image.width;
+                }
+
+            }, 50);
+        }
+
+        function repeatImg(canvas, img, options, callback) {
+            var defaultOptions = {
+                sx:0,
+                sy:0,
+                sWidth:img.width,
+                sHeight:img.height,
+                dx:0,
+                dy:0,
+                dWidth:100,
+                dHeight:100
+            };
+            var op = $.extend({}, defaultOptions, options);
+            var tpl = '<canvas id="tmpCanvas" style="display:none;"></canvas>';
+            $(document.body).append(tpl);
+            var cw = $('#tmpCanvas')[0]; 
+            cw.width = op.dWidth;
+            cw.height = op.dHeight;
+            var ctx = cw.getContext("2d"); 
+            // ctx.clearRect(0,0,100,100);
+            ctx.drawImage(img, op.sx, op.sy, op.sWidth, op.sHeight, op.dx, op.dy, op.dWidth, op.dHeight);
+            $('#tmpCanvas').remove();
+            ctxr = canvas.getContext("2d");  
+            // ctxr.clearRect(0,0,canvas.width,canvas.height);  //清除整个画布  
+            var pat = ctxr.createPattern(cw, "repeat");    //在指定的方向上重复指定的元素  
+            ctxr.fillStyle = pat;
+            if (!callback) {
+                ctxr.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                callback(ctxr);
+            }
+            
+        }
+
+        function flyFormLeft(canvas, image, options) {
+            var ctx = canvas.getContext("2d");
+                dx = options.dx ? options.dx : 0,
+                dy = options.dy ? options.dy : 0,
+                sx = options.sx ? options.sx : 0,
+                sy = options.sy ? options.sy : 0,
+                sWidth = options.sWidth ? options.sWidth : image.width,
+                sHeight = options.sHeight ? options.sHeight : image.height,
+                dWidth = options.dWidth ? options.dWidth : image.width,
+                dHeight = options.dHeight ? options.dHeight : image.height,
+                targetX = options.targetX ? options.targetX : canvas.width/2;
+
+            functionId = this.setInterval(function(){
+                ctx.clearRect(dx, dy,dWidth,dHeight);
+                dx = dx + 10;
+                ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+                if (dx >= targetX) {
+                    window.clearInterval(functionId);
+                }
+            }, 50);
+        }
+
+        function onePage(canvas) {
+            // 得到2d效果内容
+            var ctx = canvas.getContext("2d");
+            var topTextImg = $("#topText").get(0);
+            
+            topTextImg.onload = function() {
+                // ctx.save();
+                ctx.drawImage(topTextImg, 0, 0, 208, 237, (canvas.width - 208)/2 , 20, 208, 237);
+            }
+
+            var image = $("#top").get(0);
+            image.onload = function () {
+                // 小人从小变大
+                var i = 1,
+                    dWidth = 15,
+                    dHeight = 6;
+                functionId = window.setInterval(function(){
+                    ctx.clearRect((canvas.width - dWidth)/2, 250, dWidth, dHeight);
+                    dWidth = 15 * i;
+                    dHeight = 6 * i;
+                    ctx.drawImage(image, 55, 588, 1500, 640, (canvas.width - dWidth)/2, 250, dWidth, dHeight);
+                    i++;
+                    if (i == 30) {
+                        window.clearInterval(functionId);
+                    }
+                }, 50);
+
+                // 名字逐步显示
+                setTimeout(function(){
+                    ctx.drawImage(image, 0, 1400, 1500, 300, (canvas.width - 465)/2, 430, 450, 120);
+                }, 1700);
+
+                // 时间从左到右
+                setTimeout(function(){
+                    flyFormLeft(canvas, image, {
+                        sx:0,
+                        sy:1700,
+                        sWidth:1500,
+                        sHeight:300,
+                        dx:-300,
+                        dy:530,
+                        dWidth:450,
+                        dHeight:120,
+                        targetX:(canvas.width - 480)/2
+                    }); 
+                }, 1900);
+            }
+
+            return 2200 + Math.floor(((canvas.width - 480)/2 + 300)/10*50);
+
+        }
+
+        function setBgCanvas(canvas, next) {
+            // 得到2d效果内容
+            var ctx = canvas.getContext("2d");            
+            bgImg.onload = function() {
+                // repeatImg(canvas, bgImg, 180, 180); 
+                ctx.globalAlpha=0.5;
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function twoPage(canvas, next) {
+
+            var imgPathArray = [{
+                    sx: 220,
+                    sy: 230,
+                    dx: 50,
+                    dy: 80
+                },{
+                    sx: 110,
+                    sy: 230,
+                    dx: 237.5,
+                    dy: 80
+                },{
+                    sx: 110,
+                    sy: 330,
+                    dx: 50,
+                    dy: 170
+                },{
+                    sx: 10,
+                    sy: 110,
+                    dx: 237.5,
+                    dy: 170
+                },{
+                    sx: 330,
+                    sy: 230,
+                    dx: 54,
+                    dy: 280
+                },{
+                    sx: 220,
+                    sy: 330,
+                    dx: 237.5,
+                    dy: 280
+                },{
+                    sx: 10,
+                    sy: 550,
+                    dx: 50,
+                    dy: 370
+                },{
+                    sx: 330,
+                    sy: 330,
+                    dx: 237.5,
+                    dy: 370
+                },{
+                    sx: 330,
+                    sy: 550,
+                    dx: 50,
+                    dy: 460
+                },{
+                    sx: 220,
+                    sy: 440,
+                    dx: 237.5,
+                    dy: 460
+                },{
+                    sx: 110,
+                    sy: 110,
+                    dx: 50,
+                    dy: 550
+                },{
+                    sx: 10,
+                    sy: 330,
+                    dx: 237.5,
+                    dy: 550
+                }];
+
+            setTimeout(function(){
+                canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+                drawTopPage(canvas, totalTime, imgPathArray);
+            }, totalTime);
+            return (imgPathArray.length + 1) * timer;
+        }
+
+        function drawHeart(ctx) {
+          // if (canvas.getContext){
+          //   var ctx = canvas.getContext('2d');
+
+            //三次曲线
+            // drawShape3(ctx, 75, 40, 1.5, 1.5, true, true);
+            ctx.beginPath();
+            ctx.moveTo(75, 40);
+            ctx.bezierCurveTo(85,50,70,25,50,25);
+            ctx.bezierCurveTo(20,25,20,62.5,20,62.5);
+            ctx.bezierCurveTo(20,80,40,102,75,120);
+            ctx.bezierCurveTo(110,102,130,80,130,62.5);
+            ctx.bezierCurveTo(130,62.5,130,25,100,25);
+            ctx.bezierCurveTo(85,25,75,37,75,40);
+            ctx.fill();
+            // var lingrad = ctx.createLinearGradient(0,-75,0,75);
+            //   lingrad.addColorStop(0, '#232256');
+            //   lingrad.addColorStop(1, '#143778');
+              
+            //   ctx.fillStyle = lingrad;
+            //   ctx.fillRect(-75,-75,150,150);
+
+            //   // draw stars
+            //   for (var j=1;j<50;j++){
+            //     ctx.save();
+            //     ctx.fillStyle = '#fff';
+            //     ctx.translate(75-Math.floor(Math.random()*150),
+            //                   75-Math.floor(Math.random()*150));
+            //     drawStar(ctx,Math.floor(Math.random()*4)+2);
+            //     ctx.restore();
+            //   }
+          // }
+        }
+        function drawShape3(ctx, xoff, yoff, sw, sh, fi, st) {
+          ctx.beginPath();
+          ctx.moveTo(xoff - 28*sw, 71*sh + yoff);
+          // ctx.bezierCurveTo(75,37,70,25,50,25);
+          // ctx.bezierCurveTo(20,25,20,62.5,20,62.5);
+          // ctx.bezierCurveTo(20,80,40,102,75,120);
+          // ctx.bezierCurveTo(110,102,130,80,130,62.5);
+          // ctx.bezierCurveTo(130,62.5,130,25,100,25);
+          // ctx.bezierCurveTo(85,25,75,37,75,40);
+          ctx.bezierCurveTo(xoff - 20*sw, 71*sh + yoff, 55*sw + xoff, 71*sh + yoff, 75*sw + xoff, 71*sh + yoff);
+          ctx.bezierCurveTo(89*sw + xoff, 71*sh + yoff, 89*sw + xoff, 93*sh + yoff, 74*sw + xoff, 93*sh + yoff);
+          ctx.bezierCurveTo(59*sw + xoff, 93*sh + yoff, xoff - 13*sw, 94*sh + yoff, xoff - 28*sw, 94*sh + yoff);
+          ctx.bezierCurveTo(xoff - 41*sw, 94*sh + yoff, xoff - 41*sw, 72*sh + yoff, xoff - 28*sw, 71*sh + yoff);
+          if (fi==true){
+            ctx.fill();
+          }
+          if (st==true){
+            ctx.stroke();
+          }
+        }
+
+        function drawStar(ctx,r){
+          ctx.save();
+          ctx.beginPath()
+          ctx.moveTo(r,0);
+          for (var i=0;i<9;i++){
+            ctx.rotate(Math.PI/5);
+            if(i%2 == 0) {
+              ctx.lineTo((r/0.525731)*0.200811,0);
+            } else {
+              ctx.lineTo(r,0);
+            }
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function xuanzhuan(canvas,image) {
+            var ctx = canvas.getContext('2d'),
+            // image.onload = function() {
+              index = 0 ;
+              functionId = setInterval(function(){
+                  var xpos = canvas.width/2;
+                  var ypos = canvas.height/2;
+                  ctx.save();
+                  ctx.clearRect(0,0,canvas.width,canvas.height);
+                  ctx.translate(xpos, ypos);
+                  ctx.rotate(60 * index * Math.PI / 180);
+                  ctx.translate(-xpos, -ypos);
+                  ctx.drawImage(image, xpos - image.width / 2, ypos - image.height / 2);
+                  ctx.restore();
+                  index++;
+                  if (index == 6) {
+                    clearInterval(functionId);
+                                      ctx.save();
+                  ctx.clearRect(0,0,canvas.width,canvas.height);
+                  // ctx.translate(xpos, ypos);
+                  // ctx.rotate(60 * index * Math.PI / 180);
+                  // ctx.translate(-xpos, -ypos);
+                  ctx.drawImage(image, xpos - image.width / 2, ypos - image.height / 2);
+                  ctx.restore();
+                  }
+              }, 50);
+
+            // }
+          }
+
+
+        var exeQueue = [];
+
+
+        $(document).ready(function(){
+
+            var bgImg = $("#bg1").get(0);
+            var renImg = $("#ren1").get(0);
+            var ren2Img = $("#ren2").get(0);
+            // var xuehuaImg = $("#xuehua").get(0);
+
+            // 得到背景画布
+            var bgCanvas = $("#bgCanvas").get(0);
+            setFullScreen(bgCanvas);
+            setBgCanvas(bgCanvas, bgImg);
+
+            // 获取画布对象
+            var canvas = $("#myCanvas").get(0);
+            setFullScreen(canvas);
+
+            totalTime = onePage(canvas);
+
+            totalTime += twoPage(canvas);
+
+            
+
+
+            setTimeout(function(){
+                var ctx = canvas.getContext("2d");
+                var bgCtx = bgCanvas.getContext("2d");
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                bgCtx.drawImage(renImg, 0, 0, 638, 1005, 0, 0 , bgCanvas.width, bgCanvas.height);
+                var fID;
+                setTimeout(function(){
+                    var step = 0;
+                    fID = setInterval(function(){
+                        var width = step * 64;
+                        bgCtx.clearRect(0,0, width * 375/640, bgCanvas.height);
+                        bgCtx.drawImage(ren2Img, 640-width, 0, width, 1008, 0, 0 , width * 375/640, bgCanvas.height);
+                        step ++;
+                        if (width == 640) {
+                            clearInterval(fID);
+                        }
+                    },100);                    
+                }, 6500);
+
+                setTimeout(function() {
+                    var step1 = 0;
+                    fID = setInterval(function(){
+                        var width = step1 * 64;
+                        bgCtx.clearRect(375 - width * 375/640, 0, width, bgCanvas.height);
+                        bgCtx.drawImage(renImg, 0, 0, width, 1005, 375 - width * 375/640, 0 , width * 375/640, bgCanvas.height);
+                        step1 ++;
+                        if (width == 640) {
+                            clearInterval(fID);
+                        }
+                    },100);
+                }, 8000);
+
+                setTimeout(function() {
+                    ctx.clearRect(0,0, canvas.width, canvas.height);
+                    var step1 = 0;
+                    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    bgCtx.drawImage(bgImg, 0, 0, bgCanvas.width, bgCanvas.height);
+                    ctx.drawImage(renImg, 0, 0, renImg.width, renImg.height, 0, 0, canvas.width, canvas.height);
+                    fID = setInterval(function(){
+                        var width = step1 * 10;
+
+                        ctx.clearRect(0, 670-width, 375, 10);
+                        // bgCtx.drawImage(bgImg, 0, 0, bgCanvas.width, bgCanvas.height));
+                        step1 ++;
+                        if (width == 670) {
+                            clearInterval(fID);
+                        }
+                    },50);
+                }, 12000);
+
+                setTimeout(function(){
+                    var step = 0,
+                        maxStep = 10;
+                    fID = setInterval(function(){
+                        var width = step * ren2Img.width/10;
+                        // ctx.clearRect(0,0, width * 375/640, bgCanvas.height);
+                        ctx.drawImage(ren2Img, ren2Img.width-width, 0, width, ren2Img.height, 0, 0 , (width * canvas.width)/(2*ren2Img.width), canvas.height);
+                        step ++;
+                        if (step == maxStep) {
+                            clearInterval(fID);
+                        }
+                    },100);                    
+                }, 16000);
+
+
+                setTimeout(function() {
+                    var step = 0,
+                        maxStep = 10;
+                    fID = setInterval(function(){
+                        var width = step * ren2Img.width/10;
+                        // bgCtx.clearRect(375 - width * 375/640, 0, width, bgCanvas.height);
+                        ctx.drawImage(ren2Img, 0, 0, width, ren2Img.height, 375 - (width * canvas.width)/(2*ren2Img.width), 20, (width * canvas.width)/(2*ren2Img.width), (bgCanvas.height-4*20)/3);
+                        step ++;
+                        if (step == maxStep) {
+                            clearInterval(fID);
+                        }
+                    },100);
+                }, 19000);
+
+                setTimeout(function() {
+                    var step = 0,
+                        maxStep = 10;
+                    fID = setInterval(function(){
+                        var width = step * ren2Img.width/10;
+                        // bgCtx.clearRect(375 - width * 375/640, 0, width, bgCanvas.height);
+                        ctx.drawImage(ren2Img, 0, 0, width, ren2Img.height, 375 - (width * canvas.width)/(2*ren2Img.width), 20 + (bgCanvas.height-4*20)/3 + 20, (width * canvas.width)/(2*ren2Img.width), (bgCanvas.height-4*20)/3);
+                        step ++;
+                        if (step == maxStep) {
+                            clearInterval(fID);
+                        }
+                    },100);
+                }, 22000);
+
+                setTimeout(function() {
+                    var step = 0,
+                        maxStep = 10;
+                    fID = setInterval(function(){
+                        var width = step * ren2Img.width/10;
+                        // bgCtx.clearRect(375 - width * 375/640, 0, width, bgCanvas.height);
+                        ctx.drawImage(ren2Img, 0, 0, width, ren2Img.height, 375 - (width * canvas.width)/(2*ren2Img.width), 20 + (bgCanvas.height-4*20)/3 * 2 + 20 + 20, (width * canvas.width)/(2*ren2Img.width), (bgCanvas.height-4*20)/3);
+                        step ++;
+                        if (step == maxStep) {
+                            clearInterval(fID);
+                        }
+                    },100);
+                }, 24000);
+
+                setTimeout(function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(ren2Img, 0, 0, ren2Img.width, ren2Img.height, 0, 0, canvas.width, 250);
+                    var text1Array = ["We are married", "真诚期待您的光临", "您一定不能错过这场温馨浪漫的婚礼", "见证美丽的公主说出那句", "Yes I Do"];
+                    text1Array.forEach(function(text, index){
+
+                        if (index == 0 || index == text1Array.length - 1) {
+                            setTimeout(function(){
+                                ctx.save();
+                                ctx.font = "bold 48px Times New Roman";
+                                ctx.shadowOffsetX = 2;
+                                ctx.shadowOffsetY = 2;
+                                ctx.shadowBlur = 2;
+                                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                         
+                                // ctx.font = "20px Times New Roman";
+                                ctx.fillStyle = "#EE00EE";
+                                ctx.textBaseline = "bottom";
+
+                                // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+
+                                ctx.fillText(text, (canvas.width - ctx.measureText(text).width)/2,  310 + 25 * (index == 0? index : index + 1));
+                                ctx.restore();
+
+                            }, timer * index);
+                        } else {
+                            setTimeout(function(index){
+                                return function() {
+                                    ctx.save();
+                                    // ctx.font = "bold 48px 宋体";
+                                    ctx.shadowOffsetX = 2;
+                                    ctx.shadowOffsetY = 2;
+                                    ctx.shadowBlur = 2;
+                                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                             
+                                    ctx.font = "20px 宋体";
+                                    ctx.fillStyle = "#C0FF3E";
+                                    ctx.textBaseline = "bottom";
+
+                                    // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+
+                                    ctx.fillText(text, (canvas.width - ctx.measureText(text).width)/2, 310 + 25 * index);
+                                    ctx.restore();
+                                }
+                                
+                            }(index), timer * index);
+                        }
+                    });
+
+                    var addressArray = ["2016年5月2号 星期一 10:00", "举行婚礼 敬备喜宴", "席社:大连香洲花园 百合厅", "地址:大连市高尔基路XXXXXXX"];
+
+                    setTimeout(function(){
+                        addressArray.forEach(function(text, index){
+                             ctx.save();
+                             // ctx.font = "bold 48px 宋体";
+                             // ctx.shadowOffsetX = 2;
+                             // ctx.shadowOffsetY = 2;
+                             // ctx.shadowBlur = 2;
+                             // ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                             
+                             ctx.font = "20px 宋体";
+                             ctx.fillStyle = "#000000";
+                             ctx.textBaseline = "bottom";
+                             ctx.fillText(text, (canvas.width - ctx.measureText(text).width)/2, 500 + index*25);
+                             ctx.restore();  
+                        })
+                    }, 1000 * textArray.length);
+                }, 28000);
+
+                setTimeout(function(){
+                    $("#canvasDiv").hide();
+
+                    $("#form").show().height(window.innerHeight);
+
+
+                }, 35000); 
+
+                // bgCtx.drawImage(xuehuaImg, 0, 0, 398, 198, 0, 0 , bgCanvas.width, bgCanvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                var baseHeight = 0;
+                var textArray = ["很多人把真爱挂在嘴边","其实 真爱更应该放在心间","很多人把真爱","看成脱口而出的言语",
+                                    "其实 真爱只是一句", "无言又含蓄的心语情诗"];
+
+                textArray.forEach(function(text, index){
+
+                    totalTime = totalTime + timer * (index+1);
+                    
+                    setTimeout(function(){
+                         ctx.save();
+                         ctx.font = "bold 48px 宋体";
+                         ctx.shadowOffsetX = 2;
+                         ctx.shadowOffsetY = 2;
+                         ctx.shadowBlur = 2;
+                         ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                         baseHeight = 48 * index;
+                         ctx.font = "20px Times New Roman";
+                         ctx.fillStyle = "#FFFFFF";
+                         ctx.textBaseline = "bottom";
+                         var moveIndex = 0;
+                         functionId = setInterval(function(){
+                            if (moveIndex > 0) {
+                                ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+                            }
+                            moveIndex++;
+                            ctx.fillText(text, 10, 420 - moveIndex + baseHeight);
+                            if (moveIndex >10) {
+                                clearInterval(functionId);
+                                ctx.restore();
+                            }
+                         },50);
+                         
+                         
+                    }, 1000*index);
+                });                
+
+            }, totalTime + 1000);
+            
+        });
+        </script>
+    </head>
+    <body style="margin:0px;">
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+<!--         <audio autoplay="autoplay" controls="controls" loop="loop" preload="auto" src="sound/jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio> -->
+
+        <div id="canvasDiv" style="position:relative">
+        <canvas id="myCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
+            
+        </canvas>
+        <canvas id="bgCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
+            
+        </canvas>
+        </div>
+        <div id="form" width="100%" style="display:none; height:100%;text-align:center; background-image: url(images/flower.jpg);">
+            <div style="width:100% ;height:30px"></div>
+            <div id="head" class="container"></div>
+            <form action="/" method="post">
+                <h2 style="margin-top:0px; padding:10px;padding-top:30px">欢迎光临我们的婚礼</h2>
+                <input type="text" name="name" placeholder="姓名" class= "mytxt"/><br>
+                <input type="text" name="phone" placeholder="电话" class= "mytxt"/><br>
+                <input type="text" name="count" placeholder="人数" class= "mytxt"/><br>
+                <input type="text" name="comment" placeholder="留言" class= "mytxt"/><br>
+                <input type="submit" value="提交" class="mytxt"/>
+            </form>
+        </div>
+        <img id="heart_fe" src="images/heart_fe.png" style="display:none"/>
+        <img id="line1" src="images/20160216line-16.png" style="display:none"/>
+        <img id="bg1" src="images/flower.jpg" style="display:none"/>
+        <img id="top" src="images/top_without_bg.png" style="display:none"/>
+        <img id="grass2" src="images/grass2_c.png" style="display:none"/>
+        <img id="heart" src="images/heart.jpg" style="display:none"/>
+        <img id="topText" src="images/topText.png" style="display:none"/>
+        <img id="ren1" src="images/wedding_ren1.png" style="display:none"/>
+        <img id="ren2" src="images/ren2.png" style="display:none"/>
+        <img id="xuehua" src="images/xuehua.png" style="display:none"/>
+    </body>
+</html>

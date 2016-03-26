@@ -1,0 +1,22 @@
+{
+  "name": "weddingPhoto",
+  "version": "0.0.1",
+  "description": "my wedding invitation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wedding",
+    "invitation"
+  ],
+  "author": "xiagn",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "express": "~4.13.4",
+    "mongodb": "~2.1.11",
+    "mongoose": "~4.4.10",
+    "body-parser": "~1.15.0",
+    "ejs": "~2.4.1"
+  }
+}

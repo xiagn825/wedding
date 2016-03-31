@@ -510,7 +510,7 @@ function threePage(canvas, bgCanvas, totalTime) {
             functionIdObj.threePage2 = setInterval(function () {
                 var width = step * renImg.width / maxStep;
                 var sx = bgCanvas.width - width * bgCanvas.width / renImg.width;
-                alert(sx);
+//                alert(sx);
                 if (sx >= 0) {
                     bgCtx.clearRect(sx, 0, width, bgCanvas.height);
                 }

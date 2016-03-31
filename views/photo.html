@@ -169,11 +169,11 @@ $(document).ready(function () {
     image = $("#top").get(0);
 
     var imgArray = [bgImg, renImg, ren2Img, topTextImg, image, line1Img];
-    var imgLoader = imgLoader(imgArray);
+    var imgloader = imgLoader(imgArray);
 
     var loadingID = setInterval(function () {
 
-        if (imgLoader.isLoaded()) {
+        if (imgloader.isLoaded()) {
             clearInterval(loadingID);
             functionIdObj = {};
             // 得到背景画布

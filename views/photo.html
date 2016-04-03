@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<title>wedding invitation</title>
-<meta name="description" content="">
+<title>于洋与夏冠男的婚礼邀请</title>
+<meta name="description" content="于洋与夏冠男的婚礼邀请">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -253,9 +253,11 @@ function thirdPage(canvas, bgCanvas) {
             var step = 0,
                     maxStep = 10;
             functionIdObj.threePage1 = setInterval(function () {
-                var width = step * Math.ceil(ren2Img.width / maxStep);
-                bgCtx.clearRect(0, 0, Math.floor(width * bgCanvas.width / ren2Img.width), bgCanvas.height);
-                bgCtx.drawImage(ren2Img, ren2Img.width - width, 0, width, ren2Img.height, 0, 0, Math.floor(width * bgCanvas.width / ren2Img.width), bgCanvas.height);
+                var width = step * Math.ceil(ren2Img.width / maxStep) > ren2Img.width ? ren2Img.width : step * Math.ceil(ren2Img.width / maxStep);
+                var ix = ren2Img.width - width;
+                var sWidth = Math.floor(width * bgCanvas.width / ren2Img.width) > bgCanvas.width ? bgCanvas.width: Math.floor(width * bgCanvas.width / ren2Img.width);
+                bgCtx.clearRect(0, 0, sWidth, bgCanvas.height);
+                bgCtx.drawImage(ren2Img, ix < 0 ? 0 : ix, 0, width, ren2Img.height, 0, 0, sWidth, bgCanvas.height);
                 step++;
                 if (step > maxStep) {
                     clearInterval(functionIdObj.threePage1);
@@ -504,14 +506,14 @@ function fifthPage(canvas, bgCanvas) {
     }, totalTime);
 
     // 切换信息录入页面
-    setTimeout(function () {
-
-        $("#canvasDiv").hide();
-
-        $("#form").show().height(window.innerHeight);
-
-
-    }, totalTime + 30000);
+//    setTimeout(function () {
+//
+//        $("#canvasDiv").hide();
+//
+//        $("#form").show().height(window.innerHeight);
+//
+//
+//    }, totalTime + 30000);
 
     return 15000;
 }
@@ -654,6 +656,9 @@ function flyFormLeft(canvas, image, options) {
 </script>
 </head>
 <body style="margin:0px;overflow:scroll">
+<div style='margin:0 auto;width:0px;height:0px;overflow:hidden;'>
+    <img id="logo" src="../static/images/logo.jpg"/>
+</div>
 <!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
     your browser</a> to improve your experience.</p>
@@ -673,7 +678,7 @@ function flyFormLeft(canvas, image, options) {
      style="display:none; height:100%;text-align:center; background-image: url(../static/images/flower.jpg);">
     <div style="width:100% ;height:30px"></div>
     <div id="head" class="container"></div>
-    <form action="/" method="post">
+    <form action="http://52.11.24.238:8081/" method="post">
         <h2 style="margin-top:0px; padding:10px;padding-top:30px">欢迎光临我们的婚礼</h2>
         <input type="text" name="name" placeholder="姓名" class="mytxt"/><br>
         <input type="text" name="phone" placeholder="电话" class="mytxt"/><br>
@@ -693,6 +698,5 @@ function flyFormLeft(canvas, image, options) {
 <img id="ren4" src="https://ooo.0o0.ooo/2016/04/03/57014713bd4ae.jpg" style="display:none"/>
 <img id="ren5" src="https://ooo.0o0.ooo/2016/04/03/570146288b9e1.jpg" style="display:none"/>
 <img id="top" src="../static/images/top_without_bg.png" style="display:none"/>
-<img id="logo" src="../static/images/logo.png" style="display:none"/>
 </body>
 </html>

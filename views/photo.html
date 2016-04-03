@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<title></title>
+<title>wedding invitation</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="../static/css/base.css">
 <style>
 
 </style>
 
-<script src="static/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../static/bower_components/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
 
 //var exeQueue = [];
 
 
-var bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img;
+var bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img, logoImg;
 
 // 函数ID，清空定时函数用
 var functionIdObj = {};
@@ -35,6 +35,7 @@ var totalTime = 0;
 $(document).ready(function () {
 
     bgImg = $("#bg1").get(0);
+    logoImg = $("#logo").get(0);
     line1Img = $("#line1").get(0);
     renImg = $("#ren1").get(0);
     ren2Img = $("#ren2").get(0);
@@ -53,7 +54,6 @@ $(document).ready(function () {
 
         console.log($(this).offset().top);
         $(window).scrollTop($(this).offset().top);
-        console.log($(window).scrollTop);
     });
 
 });
@@ -62,12 +62,11 @@ function invitation() {
     functionIdObj = {};
     // 得到背景画布
     var bgCanvas = $("#bgCanvas").get(0);
-    setFullScreen(bgCanvas);
-    setBgCanvas(bgCanvas);
-
     // 获取画布对象
     var canvas = $("#myCanvas").get(0);
-    setFullScreen(canvas);
+    setFullScreen(canvas, bgCanvas);
+
+    setBgCanvas(bgCanvas);
 
     totalTime = firstPage(canvas);
 
@@ -299,7 +298,7 @@ function thirdPage(canvas, bgCanvas) {
                 var unitHeight = Math.ceil(canvas.height / maxStep),
                         height = step * unitHeight;
 
-                ctx.clearRect(0, canvas.height - height, canvas.width, unitHeight);
+                ctx.clearRect(0, canvas.height - height, canvas.width, unitHeight + 1);
                 step++;
                 if (step > maxStep) {
                     clearInterval(functionIdObj.threePage3);
@@ -310,7 +309,7 @@ function thirdPage(canvas, bgCanvas) {
 
     }, totalTime);
 
-    return timer * (textArray.length + 1) + 15000;
+    return timer * (textArray.length + 1) + 14000;
 }
 /**
  * 场景4
@@ -418,13 +417,13 @@ function fifthPage(canvas, bgCanvas) {
 
         text1Array.forEach(function (text, index) {
 
-            if (index == 0 || index == text1Array.length - 1) {
+            if (index == 0) {
                 setTimeout(function () {
                     ctx.save();
-                    ctx.font = "bold 42px Times New Roman";
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-                    ctx.shadowBlur = 2;
+                    ctx.font = "bold 42px Helvetica";
+                    ctx.shadowOffsetX = 5;
+                    ctx.shadowOffsetY = 5;
+                    ctx.shadowBlur = 5;
                     ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
                     // ctx.font = "20px Times New Roman";
@@ -437,21 +436,49 @@ function fifthPage(canvas, bgCanvas) {
                     ctx.restore();
 
                 }, timer * index);
+            } else if (index == text1Array.length - 1) {
+                setTimeout(function () {
+                    ctx.save();
+                    ctx.font = "bold 60px Helvetica ";
+//                    ctx.shadowOffsetX = 10;
+//                    ctx.shadowOffsetY = 10;
+//                    ctx.shadowBlur = 10;
+//                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                    ctx.shadowColor = "#EEEE00";
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = "#FFFFFF";
+//                    ctx.fillText("Blur Canvas", 40, 80);
+
+
+//                    // ctx.font = "20px Times New Roman";
+//                    ctx.fillStyle = "#EE00EE";
+//                    ctx.textBaseline = "bottom";
+
+                    // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+
+                    ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
+                    ctx.strokeStyle = "#FF0000";
+                    ctx.lineWidth = 4;
+                    ctx.strokeText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
+                    ctx.restore();
+
+                }, timer * index);
             } else {
                 setTimeout(function (index) {
                     return function () {
                         ctx.save();
                         // ctx.font = "bold 48px 宋体";
-                        ctx.shadowOffsetX = 2;
-                        ctx.shadowOffsetY = 2;
-                        ctx.shadowBlur = 2;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                        ctx.shadowBlur = 5;
                         ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
-                        ctx.font = "20px 宋体";
-                        ctx.fillStyle = "#C0FF3E";
+                        ctx.font = "bold 20px 宋体";
+                        ctx.fillStyle = "#436EEE";
                         ctx.textBaseline = "bottom";
 
-                        // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
 
                         ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 50 + 25 * index);
                         ctx.restore();
@@ -461,19 +488,19 @@ function fifthPage(canvas, bgCanvas) {
             }
         });
 
-        var addressArray = ["2016年5月2号 星期一 10:00", "举行婚礼 敬备喜宴", "席社:大连香洲花园 百合厅", "地址:大连市西岗区长春路171号","(位于体育场附近)"];
+        var addressArray = ["2016年5月2号 星期一 10:00", "席社:大连香洲花园 百合厅", "地址:大连市西岗区长春路171号","(位于体育场附近)"];
 
         setTimeout(function () {
             addressArray.forEach(function (text, index) {
                 ctx.save();
 
-                ctx.font = "20px 宋体";
+                ctx.font = "bold 20px 宋体";
                 ctx.fillStyle = "#000000";
                 ctx.textBaseline = "bottom";
                 ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, canvas.height - 10 -  (addressArray.length - index) * 25);
                 ctx.restore();
             })
-        }, 1000 * (text1Array.length + 2));
+        }, timer * (text1Array.length + 3));
     }, totalTime);
 
     // 切换信息录入页面
@@ -484,7 +511,7 @@ function fifthPage(canvas, bgCanvas) {
         $("#form").show().height(window.innerHeight);
 
 
-    }, totalTime + 12000);
+    }, totalTime + 30000);
 
     return 15000;
 }
@@ -577,13 +604,17 @@ function setBgCanvas(canvas) {
  *
  * @param canvas
  */
-function setFullScreen(canvas) {
+function setFullScreen() {
+    var canvasAry = Array.prototype.slice.call(arguments);
     // 设置全屏画布
     $(window).resize(resizeCanvas);
     function resizeCanvas() {
-        //浏览器窗口大小变化时，回调函数
-        $(canvas).attr("width", $(window).get(0).innerWidth);
-        $(canvas).attr("height", $(window).get(0).innerHeight);
+        canvasAry.forEach(function(canvas){
+            //浏览器窗口大小变化时，回调函数
+            $(canvas).attr("width", $(window).get(0).innerWidth);
+            $(canvas).attr("height", $(window).get(0).innerHeight);
+        });
+
     };
     resizeCanvas();
 }
@@ -628,7 +659,7 @@ function flyFormLeft(canvas, image, options) {
     your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<audio  autoplay="autoplay" controls="controls" loop="loop" preload="auto" src="static/sound/jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>
+<audio  autoplay="autoplay" controls="controls" preload="auto" src="../static/sound/jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>
 
 <div id="canvasDiv" style="position:relative">
     <canvas id="myCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
@@ -639,7 +670,7 @@ function flyFormLeft(canvas, image, options) {
     </canvas>
 </div>
 <div id="form" width="100%"
-     style="display:none; height:100%;text-align:center; background-image: url(static/images/flower.jpg);">
+     style="display:none; height:100%;text-align:center; background-image: url(../static/images/flower.jpg);">
     <div style="width:100% ;height:30px"></div>
     <div id="head" class="container"></div>
     <form action="/" method="post">
@@ -653,14 +684,15 @@ function flyFormLeft(canvas, image, options) {
     <br>
     <a href="/">再看一遍</a>
 </div>
-<img id="line1" src="static/images/20160216line-16.png" style="display:none"/>
-<img id="bg1" src="static/images/flower.jpg" style="display:none"/>
-<img id="topText" src="static/images/topText.png" style="display:none"/>
-<img id="ren1" src="static/images/061.jpg" style="display:none"/>
-<img id="ren2" src="static/images/206.jpg" style="display:none"/>
-<img id="ren3" src="static/images/021.jpg" style="display:none"/>
-<img id="ren4" src="static/images/188.jpg" style="display:none"/>
-<img id="ren5" src="static/images/147.jpg" style="display:none"/>
-<img id="top" src="static/images/top_without_bg.png" style="display:none"/>
+<img id="line1" src="../static/images/20160216line-16.png" style="display:none"/>
+<img id="bg1" src="../static/images/flower.jpg" style="display:none"/>
+<img id="topText" src="../static/images/topText.png" style="display:none"/>
+<img id="ren1" src="../static/images/061.jpg" style="display:none"/>
+<img id="ren2" src="../static/images/206.jpg" style="display:none"/>
+<img id="ren3" src="../static/images/021.jpg" style="display:none"/>
+<img id="ren4" src="../static/images/188.jpg" style="display:none"/>
+<img id="ren5" src="../static/images/147.jpg" style="display:none"/>
+<img id="top" src="../static/images/top_without_bg.png" style="display:none"/>
+<img id="logo" src="../static/images/logo.png" style="display:none"/>
 </body>
 </html>

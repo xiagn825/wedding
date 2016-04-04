@@ -16,14 +16,17 @@
 <script src="../static/bower_components/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
 
-//var exeQueue = [];
+// TODO 合并，全局场景参数
+var exeQueue = [false, false, false, false, false],
+    exeQueueFunction = [];
 
-
-var bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img, logoImg, yesidoImg, heartImage;
+// 图片读入
+var bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img, yesidoImg, heartImage;
 
 // 函数ID，清空定时函数用
 var functionIdObj = {};
 
+// 画面基准宽高，其他尺寸按照比例scale
 var baseWidth = 375, baseHeight=667;
 
 // 常用时间间隔
@@ -36,8 +39,8 @@ var totalTime = 0;
 
 $(document).ready(function () {
 
+    // 图片载入
     bgImg = $("#bg1").get(0);
-    logoImg = $("#logo").get(0);
     line1Img = $("#line1").get(0);
     renImg = $("#ren1").get(0);
     ren2Img = $("#ren2").get(0);
@@ -55,8 +58,7 @@ $(document).ready(function () {
     imgloader.load(invitation);
 
     $("input").focus(function(){
-
-        console.log($(this).offset().top);
+//        console.log($(this).offset().top);
         $(window).scrollTop($(this).offset().top);
     });
 
@@ -64,33 +66,67 @@ $(document).ready(function () {
 
 function invitation() {
     functionIdObj = {};
+    exeQueueFunction = [exeFirstPage, exeSecondPage, exeThirdPage, exeFourthPage, exeFifthPage];
+    exeFirstPage();
+    audioControl();
+    next();
+}
+
+// 下一页控制
+function next() {
+    var nextIcon = $("#next");
+    nextIcon.click(function() {
+        var once = false;
+        exeQueue.forEach(function(exec, index){
+            if (!exec && !once) {
+                once = true;
+                exeQueueFunction[index]();
+            }
+        })
+        if (!once) {
+            endPage();
+        }
+    });
+    nextIconMove(nextIcon);
+}
+
+function nextIconMove(nextIcon) {
+
+    var range = 0,
+        offset = 0;
+    setInterval(function(){
+        var position = nextIcon.position();
+        if (offset == -20) {
+            range = 2;
+        } else if (offset == 0){
+            range = -2;
+        }
+        offset = offset + range;
+
+        nextIcon.css("top", position.top + range);
+
+    }, 80);
+}
+
+/**
+ * 设置场景基准canvas属性
+ *
+ * @param pageID
+ */
+function settingCanvas(pageID) {
     // 得到背景画布
-    var bgCanvas = $("#bgCanvas").get(0);
+    var bgCanvas = $("#bgCanvas_"+pageID).get(0);
     // 获取画布对象
-    var canvas = $("#myCanvas").get(0);
+    var canvas = $("#myCanvas_"+pageID).get(0);
     setFullScreen(canvas, bgCanvas);
 
     setBgCanvas(bgCanvas);
-
-    totalTime = firstPage(canvas);
-
-    totalTime += secondPage(canvas);
-
-    totalTime += thirdPage(canvas, bgCanvas, totalTime);
-
-    totalTime += fourthPage(canvas, bgCanvas, totalTime);
-
-    totalTime += fifthPage(canvas, bgCanvas, totalTime);
-
-    audioControl();
-
-//    addBkSound();
-//
-//    function addBkSound() {
-//        $("body").append('<audio autoplay="autoplay" controls="controls" loop="loop" preload="auto" src="static/sound/jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>')
-//    }
 }
 
+/**
+ * 音频控制器
+ *
+ */
 function audioControl() {
     var audio = $("#audio").get(0),
             start = $("#start"),
@@ -109,7 +145,11 @@ function audioControl() {
         mute.hide();
     });
 }
-
+/**
+ * 图片加载器
+ * 防止图片加载前被使用
+ *
+ */
 function imgLoader(imgArray) {
     var loadedCount = 0,
         loadingID;
@@ -139,6 +179,59 @@ function imgLoader(imgArray) {
     }
 }
 
+// 场景导入函数 TODO 合并成一个场景导入器
+function exeFirstPage() {
+    if (!exeQueue[0]) {
+        $("#firstPage").show().siblings().hide();
+        exeQueue[0] = true;
+        settingCanvas("firstPage");
+        firstPage(exeQueueFunction[1]);
+    }
+
+}
+
+function exeSecondPage() {
+    if (!exeQueue[1]) {
+        $("#secondPage").show().siblings().hide();
+        exeQueue[1] = true;
+        settingCanvas("secondPage");
+        secondPage(exeQueueFunction[2]);
+    }
+
+}
+
+
+function exeThirdPage() {
+    if (!exeQueue[2]) {
+        $("#thirdPage").show().siblings().hide();
+        exeQueue[2] = true;
+        settingCanvas("thirdPage");
+        thirdPage(exeQueueFunction[3]);
+    }
+
+}
+
+function exeFourthPage() {
+    if (!exeQueue[3]) {
+        $("#fourthPage").show().siblings().hide();
+        exeQueue[3] = true;
+        settingCanvas("fourthPage");
+        fourthPage(exeQueueFunction[4]);
+    }
+
+}
+
+function exeFifthPage() {
+    if (!exeQueue[4]) {
+        $("#fifthPage").show().siblings().hide();
+        exeQueue[4] = true;
+        settingCanvas("fifthPage");
+        fifthPage();
+    }
+
+}
+
+
 /**
  * 场景1
  * 婚礼邀请函英文
@@ -146,13 +239,11 @@ function imgLoader(imgArray) {
  * 新郎新娘名字显示
  * 婚礼时间从左侧开始显示
  *
- * @param canvas
- * @returns {number}
  */
-function firstPage(canvas) {
+function firstPage(next) {
+    var canvas =  $("#myCanvas_firstPage").get(0);
     // 得到2d效果内容
     var ctx = canvas.getContext("2d");
-//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     // 婚礼邀请函英文
     ctx.drawImage(topTextImg, 0, 0, 208, 237, (baseWidth - 208) / 2, 20, 208, Math.floor(baseHeight / 3) - 10);
 
@@ -191,15 +282,17 @@ function firstPage(canvas) {
         });
     }, 4000);
 
-    return 4000 + Math.floor(((baseWidth - 480) / 2 + 300) / 10 * 50) + rangeTimer;
+    if (next) {
+        setTimeout(next, 4000 + Math.floor(((baseWidth - 480) / 2 + 300) / 10 * 50) + rangeTimer);
+    }
 
 }
 
 /**
  *  第二场景
  */
-function secondPage(canvas, next) {
-
+function secondPage(next) {
+    var canvas =  $("#myCanvas_secondPage").get(0);
     // 轮询图片
     var imgPathArray = [{sx: 220,sy: 230},{sx: 110,sy: 230},
                         {sx: 110,sy: 340},{sx: 10,sy: 110},
@@ -208,13 +301,11 @@ function secondPage(canvas, next) {
                         {sx: 318,sy: 550},{sx: 220,sy: 440},
                         {sx: 110,sy: 110},{sx: 10,sy: 330}];
 
-
-    setTimeout(function () {
-        canvas.getContext("2d").clearRect(0, 0, baseWidth, baseHeight);
-        drawTopPage(canvas, imgPathArray);
-    }, totalTime);
-
-    return imgPathArray.length * timer + rangeTimer;
+    canvas.getContext("2d").clearRect(0, 0, baseWidth, baseHeight);
+    drawTopPage(canvas, imgPathArray);
+    if (next) {
+        setTimeout(next, imgPathArray.length * 1000 + rangeTimer);
+    }
 }
 
 /**
@@ -227,119 +318,117 @@ function secondPage(canvas, next) {
  * 从下到上图片消失
  *
  */
-function thirdPage(canvas, bgCanvas) {
+function thirdPage(next) {
+    var canvas =  $("#myCanvas_thirdPage").get(0);
+    var bgCanvas =  $("#bgCanvas_thirdPage").get(0);
     var ctx = canvas.getContext("2d");
-//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     var bgCtx = bgCanvas.getContext("2d");
-//    bgCtx.scale(bgCanvas.width/baseWidth, bgCanvas.height/baseHeight);
 
     var textArray = ["很多人把真爱挂在嘴边", "其实 真爱更应该放在心间", "很多人把真爱", "看成脱口而出的言语",
         "其实 真爱只是一句", "无言又含蓄的心语情诗"];
 
-    setTimeout(function () {
+    ctx.clearRect(0, 0, baseWidth, baseHeight);
 
-        ctx.clearRect(0, 0, baseWidth, baseHeight);
+    var baseMoveHeight = 0;
 
-        var baseMoveHeight = 0;
-
-        textArray.forEach(function (text, index) {
-            functionIdObj.threePage = [];
-            setTimeout(function () {
-                ctx.save();
-                ctx.font = "bold 48px 宋体";
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-                ctx.shadowBlur = 2;
-                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-                baseMoveHeight = 48 * index;
-                ctx.font = "20px Times New Roman";
-                ctx.fillStyle = "#FFFFFF";
-                ctx.textBaseline = "bottom";
-                var moveIndex = 0;
-                functionIdObj.threePage[index] = setInterval(function () {
-                    if (moveIndex > 0) {
-                        ctx.clearRect(10, baseHeight / 2 + baseMoveHeight - 48, ctx.measureText(text).width + 5, 60);
-                    }
-                    moveIndex++;
-                    ctx.fillText(text, 10, baseHeight / 2 + baseMoveHeight - moveIndex);
-                    if (moveIndex > 10) {
-                        clearInterval(functionIdObj.threePage[index]);
-                        ctx.restore();
-                    }
-                }, 50);
-
-
-            }, timer * index);
-        });
-
-        // 绘制图片背景
-        bgCtx.clearRect(0, 0, baseWidth, baseHeight);
-        bgCtx.drawImage(renImg, 0, 0, renImg.width, renImg.height, 0, 0, baseWidth, baseHeight);
-
-        // 从左到右绘制图片
+    textArray.forEach(function (text, index) {
+        functionIdObj.threePage = [];
         setTimeout(function () {
-            var step = 0,
-                    maxStep = 10;
-            functionIdObj.threePage1 = setInterval(function () {
-                var width = step * Math.ceil(ren2Img.width / maxStep) > ren2Img.width ? ren2Img.width : step * Math.ceil(ren2Img.width / maxStep);
-                var ix = ren2Img.width - width;
-                var sWidth = Math.floor(width * baseWidth / ren2Img.width) > baseWidth ? baseWidth: Math.floor(width * baseWidth / ren2Img.width);
-                bgCtx.clearRect(0, 0, sWidth, baseHeight);
-                bgCtx.drawImage(ren2Img, ix < 0 ? 0 : ix, 0, width, ren2Img.height, 0, 0, sWidth, baseHeight);
-                step++;
-                if (step > maxStep) {
-                    clearInterval(functionIdObj.threePage1);
+            ctx.save();
+            ctx.font = "bold 48px 宋体";
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.shadowBlur = 2;
+            ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+            baseMoveHeight = 48 * index;
+            ctx.font = "20px Times New Roman";
+            ctx.fillStyle = "#FFFFFF";
+            ctx.textBaseline = "bottom";
+            var moveIndex = 0;
+            functionIdObj.threePage[index] = setInterval(function () {
+                if (moveIndex > 0) {
+                    ctx.clearRect(10, baseHeight / 2 + baseMoveHeight - 48, ctx.measureText(text).width + 5, 60);
                 }
-            }, 100);
-        }, timer * (textArray.length + 1));
-
-        // 从右到左绘制图片
-        setTimeout(function () {
-            var step = 0,
-                    maxStep = 10;
-            functionIdObj.threePage2 = setInterval(function () {
-                var width = step * ren3Img.width / maxStep;
-                var sx = baseWidth - width * baseWidth / ren3Img.width;
-//                alert(sx);
-                if (sx >= 0) {
-                    bgCtx.clearRect(sx, 0, width, baseHeight);
-                }
-                bgCtx.drawImage(ren3Img, 0, 0, width, ren3Img.height, sx < 10 ? 0 : sx, 0, width * baseWidth / ren3Img.width, baseHeight);
-                step++;
-                if (step > maxStep) {
-                    clearInterval(functionIdObj.threePage2);
-                }
-            }, 100);
-        }, timer * (textArray.length + 1) + 5000);
-
-        // 从下到上消除图片
-        setTimeout(function () {
-
-            var step = 0,
-                    maxStep = 100;
-            ctx.clearRect(0, 0, baseWidth, baseHeight);
-
-            bgCtx.clearRect(0, 0, baseWidth, baseHeight);
-            bgCtx.drawImage(bgImg, 0, 0, baseWidth, baseHeight);
-
-            ctx.drawImage(ren3Img, 0, 0, ren3Img.width, ren3Img.height, 0, 0, baseWidth, baseHeight);
-
-            functionIdObj.threePage3 = setInterval(function () {
-                var unitHeight = Math.ceil(baseHeight / maxStep),
-                        height = step * unitHeight;
-
-                ctx.clearRect(0, baseHeight - height, baseWidth, unitHeight + 1);
-                step++;
-                if (step > maxStep) {
-                    clearInterval(functionIdObj.threePage3);
+                moveIndex++;
+                ctx.fillText(text, 10, baseHeight / 2 + baseMoveHeight - moveIndex);
+                if (moveIndex > 10) {
+                    clearInterval(functionIdObj.threePage[index]);
+                    ctx.restore();
                 }
             }, 50);
 
-        }, timer * (textArray.length + 1) + 9000);
 
-    }, totalTime);
+        }, timer * index);
+    });
 
-    return timer * (textArray.length + 1) + 14000;
+    // 绘制图片背景
+    bgCtx.clearRect(0, 0, baseWidth, baseHeight);
+    bgCtx.drawImage(renImg, 0, 0, renImg.width, renImg.height, 0, 0, baseWidth, baseHeight);
+
+    // 从左到右绘制图片
+    setTimeout(function () {
+        var step = 0,
+                maxStep = 10;
+        functionIdObj.threePage1 = setInterval(function () {
+            var width = step * Math.ceil(ren2Img.width / maxStep) > ren2Img.width ? ren2Img.width : step * Math.ceil(ren2Img.width / maxStep);
+            var ix = ren2Img.width - width;
+            var sWidth = Math.floor(width * baseWidth / ren2Img.width) > baseWidth ? baseWidth: Math.floor(width * baseWidth / ren2Img.width);
+            bgCtx.clearRect(0, 0, sWidth, baseHeight);
+            bgCtx.drawImage(ren2Img, ix < 0 ? 0 : ix, 0, width, ren2Img.height, 0, 0, sWidth, baseHeight);
+            step++;
+            if (step > maxStep) {
+                clearInterval(functionIdObj.threePage1);
+            }
+        }, 100);
+    }, timer * (textArray.length + 1));
+
+    // 从右到左绘制图片
+    setTimeout(function () {
+        var step = 0,
+                maxStep = 10;
+        functionIdObj.threePage2 = setInterval(function () {
+            var width = step * ren3Img.width / maxStep;
+            var sx = baseWidth - width * baseWidth / ren3Img.width;
+//                alert(sx);
+            if (sx >= 0) {
+                bgCtx.clearRect(sx, 0, width, baseHeight);
+            }
+            bgCtx.drawImage(ren3Img, 0, 0, width, ren3Img.height, sx < 10 ? 0 : sx, 0, width * baseWidth / ren3Img.width, baseHeight);
+            step++;
+            if (step > maxStep) {
+                clearInterval(functionIdObj.threePage2);
+            }
+        }, 100);
+    }, timer * (textArray.length + 1) + 5000);
+
+    // 从下到上消除图片
+    setTimeout(function () {
+
+        var step = 0,
+                maxStep = 100;
+        ctx.clearRect(0, 0, baseWidth, baseHeight);
+
+        bgCtx.clearRect(0, 0, baseWidth, baseHeight);
+        bgCtx.drawImage(bgImg, 0, 0, baseWidth, baseHeight);
+
+        ctx.drawImage(ren3Img, 0, 0, ren3Img.width, ren3Img.height, 0, 0, baseWidth, baseHeight);
+
+        functionIdObj.threePage3 = setInterval(function () {
+            var unitHeight = Math.ceil(baseHeight / maxStep),
+                    height = step * unitHeight;
+
+            ctx.clearRect(0, baseHeight - height, baseWidth, unitHeight + 1);
+            step++;
+            if (step > maxStep) {
+                clearInterval(functionIdObj.threePage3);
+            }
+        }, 50);
+
+    }, timer * (textArray.length + 1) + 9000);
+
+    if (next) {
+        setTimeout(next, timer * (textArray.length + 1) + 14000);
+    }
 }
 /**
  * 场景4
@@ -348,48 +437,49 @@ function thirdPage(canvas, bgCanvas) {
  * 从右到左显示三张图片
  *
  */
-function fourthPage(canvas, bgCanvas, totalTime) {
+function fourthPage(next) {
+    var canvas =  $("#myCanvas_fourthPage").get(0);
     var ctx = canvas.getContext("2d");
-//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
-//    var bgCtx = bgCanvas.getContext("2d");
 
-    // 由大变小再抖动
-    setTimeout(function () {
-        var step = 1,
-            maxStep = 10;
-        functionIdObj.fourPage1 = setInterval(function () {
+    var step = 1,
+        maxStep = 10;
+    functionIdObj.fourPage1 = setInterval(function () {
+        ctx.save();
+        ctx.clearRect(0, 0, baseWidth, baseHeight);
+        ctx.translate(-baseWidth * 0.5 * (1 - step/10), -baseHeight * 0.5 *  (1 - step/10));
+        ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth * (2 - step/10), baseHeight * (2 - step/10));
+        ctx.restore();
+        step++;
+        if (step == maxStep) {
+            clearInterval(functionIdObj.fourPage1);
+//                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width, canvas.height);
             ctx.save();
             ctx.clearRect(0, 0, baseWidth, baseHeight);
-            ctx.translate(-baseWidth * 0.5 * (1 - step/10), -baseHeight * 0.5 *  (1 - step/10));
-            ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth * (2 - step/10), baseHeight * (2 - step/10));
+            ctx.translate(10, 10);
+            ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth-20, baseHeight-20);
             ctx.restore();
-            step++;
-            if (step == maxStep) {
-                clearInterval(functionIdObj.fourPage1);
-//                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width, canvas.height);
+            setTimeout(function(){
+                ctx.clearRect(0, 0, baseWidth, baseHeight);
+                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth, baseHeight);
+            }, 500);
+            setTimeout(function(){
                 ctx.save();
                 ctx.clearRect(0, 0, baseWidth, baseHeight);
                 ctx.translate(10, 10);
                 ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth-20, baseHeight-20);
                 ctx.restore();
-                setTimeout(function(){
-                    ctx.clearRect(0, 0, baseWidth, baseHeight);
-                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth, baseHeight);
-                }, 500);
-                setTimeout(function(){
-                    ctx.save();
-                    ctx.clearRect(0, 0, baseWidth, baseHeight);
-                    ctx.translate(10, 10);
-                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth-20, baseHeight-20);
-                    ctx.restore();
-                }, 1000);
-                setTimeout(function(){
-                    ctx.clearRect(0, 0, baseWidth, baseHeight);
-                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth, baseHeight);
-                }, 1500);
-            }
-        }, 50);
-    }, totalTime + timer);
+            }, 1000);
+            setTimeout(function(){
+                ctx.clearRect(0, 0, baseWidth, baseHeight);
+                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth, baseHeight);
+            }, 1500);
+        }
+    }, 50);
+
+
+    if (next) {
+        setTimeout(next, rangeTimer);
+    }
 
 
     // 从左到右至一半停止
@@ -429,7 +519,7 @@ function fourthPage(canvas, bgCanvas, totalTime) {
 //        }(i), totalTime + timer + 2000 * (i + 1));
 //    }
 
-    return timer + 2000 + rangeTimer;
+//    return timer + 2000 + rangeTimer;
 
 }
 /**
@@ -439,183 +529,116 @@ function fourthPage(canvas, bgCanvas, totalTime) {
  * 出现婚礼具体地点
  *
  */
-function fifthPage(canvas, bgCanvas) {
+function fifthPage(next) {
+    var canvas =  $("#myCanvas_fifthPage").get(0);
+    var bgCanvas =  $("#bgCanvas_fifthPage").get(0);
     var ctx = canvas.getContext("2d"),
         bgCtx = bgCanvas.getContext("2d");
 
-//        ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
-//        bgCtx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     var text1Array = ["We are married", "真诚期待您的光临", "您一定不能错过这场温馨浪漫的婚礼", "见证美丽的公主说出那句", "Yes I Do"];
-    setTimeout(function () {
-        ctx.clearRect(0, 0, baseWidth, baseHeight);
-        ctx.drawImage(ren5Img, 0, 0, ren5Img.width, ren5Img.height, 0, 0, baseWidth, baseWidth*0.6);
+    ctx.clearRect(0, 0, baseWidth, baseHeight);
+    ctx.drawImage(ren5Img, 0, 0, ren5Img.width, ren5Img.height, 0, 0, baseWidth, baseWidth*0.6);
 
+    text1Array.forEach(function (text, index) {
 
+        if (index == 0) {
+            setTimeout(function () {
+                // 绘制圆型渐近背景
+                var rGrd =ctx.createRadialGradient(baseWidth/2, baseWidth*0.3, 50, baseWidth/2, baseWidth*0.3, baseWidth*0.4);
+                rGrd.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                rGrd.addColorStop(0.2, 'rgba(255, 255, 255, 0.2)');
+                rGrd.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)');
+                rGrd.addColorStop(0.6, 'rgba(255, 255, 255, 0.6)');
+                rGrd.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
+                rGrd.addColorStop(1, 'rgba(255, 255, 255, 1)');
+                //        rGrd.addColorStop(0.4, '#FFC125');
+                //        rGrd.addColorStop(0.6, '#FF7F00');
+                //        rGrd.addColorStop(0.8, '#FF0000');
+                //        rGrd.addColorStop(1, '#EE0000');
+                ctx.fillStyle = rGrd;
+                //        ctx.globalAlpha = 0.5;
+                ctx.fillRect(0, 0, baseWidth, baseWidth*0.6);
+                ctx.save();
+                ctx.font = "bold 42px Helvetica";
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
-        text1Array.forEach(function (text, index) {
+                // ctx.font = "20px Times New Roman";
+                ctx.fillStyle = "#FFE7BA";
+                ctx.textBaseline = "bottom";
 
-            if (index == 0) {
-                setTimeout(function () {
-                    // 绘制圆型渐近背景
-                    var rGrd =ctx.createRadialGradient(baseWidth/2, baseWidth*0.3, 50, baseWidth/2, baseWidth*0.3, baseWidth*0.4);
-                    rGrd.addColorStop(0, 'rgba(255, 255, 255, 0)');
-                    rGrd.addColorStop(0.2, 'rgba(255, 255, 255, 0.2)');
-                    rGrd.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)');
-                    rGrd.addColorStop(0.6, 'rgba(255, 255, 255, 0.6)');
-                    rGrd.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
-                    rGrd.addColorStop(1, 'rgba(255, 255, 255, 1)');
-                    //        rGrd.addColorStop(0.4, '#FFC125');
-                    //        rGrd.addColorStop(0.6, '#FF7F00');
-                    //        rGrd.addColorStop(0.8, '#FF0000');
-                    //        rGrd.addColorStop(1, '#EE0000');
-                    ctx.fillStyle = rGrd;
-                    //        ctx.globalAlpha = 0.5;
-                    ctx.fillRect(0, 0, baseWidth, baseWidth*0.6);
+                // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+
+                ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, Math.floor(baseHeight / 3) + 50 + 25 * (index == 0 ? index : index + 1));
+                ctx.restore();
+
+            }, timer * index);
+        } else if (index == text1Array.length - 1) {
+            setTimeout(function () {
+
+                $("#heart").show().css("position", "absolute").css("top", (baseHeight - 188)/2 + 90)
+                        .css("left", 0).css("z-index", "4");
+
+                ctx.drawImage(yesidoImg, 0, 0, 360, 188, (baseWidth - 180) / 2, (baseHeight - 188)/2 + 90, 180, 188);
+
+            }, timer * index);
+        } else {
+            setTimeout(function (index) {
+                return function () {
                     ctx.save();
-                    ctx.font = "bold 42px Helvetica";
-                    ctx.shadowOffsetX = 5;
-                    ctx.shadowOffsetY = 5;
+                    // ctx.font = "bold 48px 宋体";
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
                     ctx.shadowBlur = 5;
                     ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
-                    // ctx.font = "20px Times New Roman";
-                    ctx.fillStyle = "#FFE7BA";
+                    ctx.font = "bold 20px 宋体";
+                    ctx.fillStyle = "#EE799F";
                     ctx.textBaseline = "bottom";
 
-                    // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
 
-                    ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, Math.floor(baseHeight / 3) + 50 + 25 * (index == 0 ? index : index + 1));
+                    ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, Math.floor(baseHeight / 3) + 50 + 25 * index);
                     ctx.restore();
+                }
 
-                }, timer * index);
-            } else if (index == text1Array.length - 1) {
-                setTimeout(function () {
-                    // 绘制圆型渐近背景
-//                    var rGrd =bgCtx.createRadialGradient(canvas.width/2, (canvas.height - canvas.width*0.6)/2 + canvas.width*0.6, 50, canvas.width/2, (canvas.height - canvas.width*0.6)/2 + canvas.width*0.6, canvas.width*0.8);
-//                    rGrd.addColorStop(0, '#FFFFFF');
-//                    rGrd.addColorStop(0.2, '#FFEC8B');
-//                    rGrd.addColorStop(0.4, '#FFC125');
-//                    rGrd.addColorStop(0.6, '#FF7F00');
-//                    rGrd.addColorStop(0.8, '#FF0000');
-//                    rGrd.addColorStop(1, '#EE0000');
-//                    bgCtx.fillStyle = rGrd;
-//                    bgCtx.globalAlpha = 0.5;
-//                    repeatImg(bgCanvas, heartImage, {}, function(bgCtxr){
-//                        bgCtxr.fillRect(0, Math.floor(canvas.height / 3) + 25 * (index == 0 ? index : index + 1), canvas.width, 200);
-//                    });
+            }(index), timer * index);
+        }
+    });
 
-//                    position:absolute;left:0;top:0;z-index:3
+    var addressArray = ["2016年5月2号 星期一 10:00", "席社:大连香洲花园 百合厅", "地址:大连市西岗区长春路171号","(位于体育场附近)"];
 
-                    $("#heart").show().css("position", "absolute").css("top", (baseHeight - 188)/2 + 90)
-                            .css("left", 0).css("z-index", "4");
+    setTimeout(function () {
+        addressArray.forEach(function (text, index) {
+            ctx.save();
 
-                    ctx.drawImage(yesidoImg, 0, 0, 360, 188, (baseWidth - 180) / 2, (baseHeight - 188)/2 + 90, 180, 188);
-//                    ctx.save();
-//                    ctx.font = "bold 60px Helvetica ";
-////                    ctx.shadowOffsetX = 10;
-////                    ctx.shadowOffsetY = 10;
-////                    ctx.shadowBlur = 10;
-////                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-//                    ctx.shadowColor = "#F0FFFF";
-//                    ctx.shadowOffsetX = 0;
-//                    ctx.shadowOffsetY = 0;
-//                    ctx.shadowBlur = 15;
-//                    ctx.fillStyle = "#FFFFFF";
-////                    ctx.fillText("Blur Canvas", 40, 80);
-//
-//
-////                    // ctx.font = "20px Times New Roman";
-////                    ctx.fillStyle = "#EE00EE";
-////                    ctx.textBaseline = "bottom";
-//
-//                    // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
-//
-//                    ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
-//                    ctx.strokeStyle = "#FF0000";
-//                    ctx.lineWidth = 4;
-//                    ctx.strokeText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
-//                    ctx.restore();
-
-                }, timer * index);
-            } else {
-                setTimeout(function (index) {
-                    return function () {
-                        ctx.save();
-                        // ctx.font = "bold 48px 宋体";
-                        ctx.shadowOffsetX = 0;
-                        ctx.shadowOffsetY = 0;
-                        ctx.shadowBlur = 5;
-                        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-
-                        ctx.font = "bold 20px 宋体";
-                        ctx.fillStyle = "#EE799F";
-                        ctx.textBaseline = "bottom";
-
-
-                        ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, Math.floor(baseHeight / 3) + 50 + 25 * index);
-                        ctx.restore();
-                    }
-
-                }(index), timer * index);
-            }
-        });
-
-        var addressArray = ["2016年5月2号 星期一 10:00", "席社:大连香洲花园 百合厅", "地址:大连市西岗区长春路171号","(位于体育场附近)"];
-
-        setTimeout(function () {
-            addressArray.forEach(function (text, index) {
-                ctx.save();
-
-                ctx.font = "bold 20px 宋体";
-                ctx.fillStyle = "#000000";
-                ctx.textBaseline = "bottom";
-                ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, baseHeight - 10 -  (addressArray.length - index) * 25);
-                ctx.restore();
-            })
-        }, timer * (text1Array.length + 3));
-    }, totalTime);
+            ctx.font = "bold 20px 宋体";
+            ctx.fillStyle = "#000000";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, baseHeight - 10 -  (addressArray.length - index) * 25);
+            ctx.restore();
+        })
+    }, timer * (text1Array.length + 3));
 
     // 切换信息录入页面
-    setTimeout(function () {
-
-        $("#canvasDiv").hide();
-        $("#heart").hide()
-
-        $("#formDiv").show().height(window.innerHeight);
-
-        $("#form").submit(function(e){
-//            var data = $("#form").serializeArray();
-
-//            var frameForm = $('<form>', {
-//                id: 'frameForm',
-//                action:'http://52.11.24.238:8081/',
-//                method:'POST'
-//            });
-////            alert(frameForm);
-//
-//            $("#form").find('input[type="text"]').each(function(index, text){
-//                frameForm.append(text);
-//            });
-////            alert(frameForm.find('input[type="text"]').length);
-//            $(document.getElementById("frame").contentWindow.document.body).append(frameForm);
-////            $("#frameName").val(data[0].value);
-//            alert($(document.getElementById("frame").contentWindow.document.body).find("#frameForm").attr("action"));
-//            $(document.getElementById("frame").contentWindow.document.body).find("#frameForm").submit();
-//
-//           e.stopPropagation();
-//           e.preventDefault();
-           $("#form").hide();
-           $("#result").show();
-            return true;
-//           return false;
-        });
-
-
-
-    }, totalTime + 20000);
-
-    return 15000;
+    setTimeout(endPage, 20000);
 }
+
+function endPage() {
+    $("#canvasDiv").hide();
+    $("#heart").hide();
+    $("#next").hide();
+
+    $("#formDiv").show().height(window.innerHeight);
+
+    $("#form").submit(function(e){
+        $("#form").hide();
+        $("#result").show();
+        return true;
+    });
+}
+
 
 function drawTopPage(canvas, imgPathArray) {
     // 得到2d效果内容
@@ -683,7 +706,7 @@ function drawTopPage(canvas, imgPathArray) {
                     dy = beginHeight + Math.floor(index / 2) * baseOptions.dHeight;
                     ctx.drawImage(image, options.sx, options.sy, options.sWidth, options.sHeight, dx, dy, options.dWidth, options.dHeight);
                 }
-            })(tmpOptions, index), timer * index);
+            })(tmpOptions, index), 1000 * index);
         }
     }
 }
@@ -753,42 +776,6 @@ function flyFormLeft(canvas, image, options) {
     }, 50);
 }
 
-function repeatImg(canvas, img, options, callback) {
-    var defaultOptions = {
-        sx:0,
-        sy:0,
-        sWidth:img.width,
-        sHeight:img.height,
-        dx:0,
-        dy:0,
-        dWidth:100,
-        dHeight:100
-    };
-    var op = $.extend({}, defaultOptions, options);
-    var tpl = '<canvas id="tmpCanvas" style="display:none;"></canvas>';
-    $(document.body).append(tpl);
-    var cw = $('#tmpCanvas')[0];
-    cw.width = op.dWidth;
-    cw.height = op.dHeight;
-    var ctx = cw.getContext("2d");
-    // ctx.clearRect(0,0,100,100);
-    ctx.drawImage(img, op.sx, op.sy, op.sWidth, op.sHeight, op.dx, op.dy, op.dWidth, op.dHeight);
-    $('#tmpCanvas').remove();
-    var ctxr = canvas.getContext("2d");
-    // ctxr.clearRect(0,0,canvas.width,canvas.height);  //清除整个画布
-    var pat = ctxr.createPattern(cw, "repeat");    //在指定的方向上重复指定的元素
-    ctxr.fillStyle = pat;
-    if (!callback) {
-        ctxr.fillRect(0, 0, canvas.width, canvas.height);
-    } else {
-        callback(ctxr);
-    }
-
-}
-
-
-
-
 </script>
 </head>
 <body style="margin:0px;overflow:scroll">
@@ -804,13 +791,59 @@ function repeatImg(canvas, img, options, callback) {
 
 <audio id="audio" autoplay="autoplay" controls="controls" preload="auto" src="http://sh.ctfs.ftn.qq.com/ftn_handler/f465c1f22f3a5bead8c2a7cdca931be951f14d16765ea65bf43dfe1d259f49e7efe6c48c718cc5659ddeec4fd8e27b4e8b2dee905bc485ddad84d9af857f42c1/?fname=jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>
 
-<div id="canvasDiv" style="position:relative">
-    <canvas id="myCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
+<!--<div id="canvasDiv" style="position:relative">-->
+    <!--<canvas id="myCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">-->
+
+    <!--</canvas>-->
+    <!--<canvas id="bgCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">-->
+
+    <!--</canvas>-->
+<!--</div>-->
+<div id="canvasDiv">
+<div id="firstPage" style="position:relative ">
+    <canvas id="myCanvas_firstPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
 
     </canvas>
-    <canvas id="bgCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
+    <canvas id="bgCanvas_firstPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
 
     </canvas>
+</div>
+
+<div id="secondPage" style="position:relative; display:none">
+    <canvas id="myCanvas_secondPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
+
+    </canvas>
+    <canvas id="bgCanvas_secondPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
+
+    </canvas>
+</div>
+
+<div id="thirdPage" style="position:relative; display:none">
+    <canvas id="myCanvas_thirdPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
+
+    </canvas>
+    <canvas id="bgCanvas_thirdPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
+
+    </canvas>
+</div>
+
+<div id="fourthPage" style="position:relative; display:none">
+    <canvas id="myCanvas_fourthPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
+
+    </canvas>
+    <canvas id="bgCanvas_fourthPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
+
+    </canvas>
+</div>
+
+<div id="fifthPage" style="position:relative; display:none">
+    <canvas id="myCanvas_fifthPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
+
+    </canvas>
+    <canvas id="bgCanvas_fifthPage" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:2">
+
+    </canvas>
+</div>
 </div>
 <div id="formDiv" width="100%"
      style="display:none; height:100%;text-align:center; background-image: url(../static/images/flower.jpg);">
@@ -841,6 +874,7 @@ function repeatImg(canvas, img, options, callback) {
 <img id="top" src="../static/images/top_without_bg.png" style="display:none"/>
 <img id="yesido" src="https://ooo.0o0.ooo/2016/04/04/570230871f9cd.png" style="display:none"/>
 <img id="heart" src="https://ooo.0o0.ooo/2016/04/04/57023091e331a.png" style="display:none;width:100%"/>
+<img id="next" style="z-index:4; position:fixed; bottom:10px; left:45%;width:35px" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAkCAMAAADip6m2AAAAolBMVEUAAAAAAAAAAAAAAAAAAAABAQEAAAAAAAAHBwcAAAD////9/f37+/vt7e25ubn39/cKCgrz8/Pe3t7c3Nz+/v729vbW1tZra2tKSkoAAABpaWlgYGD9/f38/Pz5+fn5+fn39/fz8/Px8fHu7u7q6urm5ubj4+Pd3d3y8vLX19fJycnAwMC4uLisrKyhoaGVlZWGhoajo6MpKSkxMTGAgID///9oDYyzAAAANXRSTlMAAwcLFR0SGRAO+efJbSOcIqBDQvLNbTEpGxEQ9e3h29XDvLOsnJOJiIFpYVlNRkE7MiwfDLl52bwAAAGFSURBVEjH3ZXZboMwFERbHAMhC6EFQtrs+777/3+t98bGjmwqy32plHmLPYfMiYTy9nJ5F/kb693j+O4h7Y567SZjzbYHuDv72WCQxgfSjixpReyRqEWAdmK/YyaTfAHtpivjIo6TUReTZYxxcZzupju/XufP4g660aYD2USmuF13sKeP7Ae6uF13fKZBDRLQ81gTt+rOCmD9MPSBLmaauEV3hWidQOqIr57FLbrpDllCPAghSO9SU7xad3QCNiRQgwAeAn0a6eLVutOC4mRk+SCcToupIW7qsmWnByw25B3Svc6SaeKGbn9LA8UqGsW3fVMc2VJ3eJS6apcUPw5LcVmAq1J30qWBL1mN9gPanZTiUBE3pe5C6cpo4gtRjXkJjtf8cbnSlTHEcz5yTTwBh00UOVToVogfGvibhQq+pCyr0q0Wz1h6kTDsyZObPvn36bckh6qA8YE1eIUEa6GxyyeKEzhC1MLy6byL3yNP4BNn7TSWVRffHYHaI7qq7PB3qMr/mh8s20b2bOZlXQAAAABJRU5ErkJggg=="/>
 </body>
 </html>
 <iframe id="frame" style="display:none;">

@@ -577,7 +577,9 @@ function fifthPage(next) {
             }, timer * index);
         } else if (index == text1Array.length - 1) {
             setTimeout(function () {
-
+                if ($("fifthPage:visible").length == 0) {
+                    return;
+                }
                 $("#heart").show().css("position", "absolute").css("top", (baseHeight - 188)/2 + 90)
                         .css("left", 0).css("z-index", "4");
 

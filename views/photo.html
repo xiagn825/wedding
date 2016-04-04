@@ -19,10 +19,12 @@
 //var exeQueue = [];
 
 
-var bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img, logoImg;
+var bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img, logoImg, yesidoImg, heartImage;
 
 // 函数ID，清空定时函数用
 var functionIdObj = {};
+
+var baseWidth = 375, baseHeight=667;
 
 // 常用时间间隔
 var timer = 1500,
@@ -44,8 +46,10 @@ $(document).ready(function () {
     ren5Img = $("#ren5").get(0);
     topTextImg = $("#topText").get(0);
     image = $("#top").get(0);
+    yesidoImg = $("#yesido").get(0);
+    heartImage = $("#heart").get(0);
 
-    var imgArray = [bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img];
+    var imgArray = [bgImg, renImg, ren2Img, ren3Img, ren4Img, ren5Img, topTextImg, image, line1Img, yesidoImg, heartImage];
     var imgloader = imgLoader(imgArray);
 
     imgloader.load(invitation);
@@ -78,11 +82,32 @@ function invitation() {
 
     totalTime += fifthPage(canvas, bgCanvas, totalTime);
 
+    audioControl();
+
 //    addBkSound();
 //
 //    function addBkSound() {
 //        $("body").append('<audio autoplay="autoplay" controls="controls" loop="loop" preload="auto" src="static/sound/jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>')
 //    }
+}
+
+function audioControl() {
+    var audio = $("#audio").get(0),
+            start = $("#start"),
+            mute = $("#mute");
+
+    start.click(function(){
+        audio.pause();
+        start.hide();
+        mute.show();
+
+    });
+
+    mute.click(function(){
+        audio.play();
+        start.show();
+        mute.hide();
+    });
 }
 
 function imgLoader(imgArray) {
@@ -127,18 +152,19 @@ function imgLoader(imgArray) {
 function firstPage(canvas) {
     // 得到2d效果内容
     var ctx = canvas.getContext("2d");
+//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     // 婚礼邀请函英文
-    ctx.drawImage(topTextImg, 0, 0, 208, 237, (canvas.width - 208) / 2, 20, 208, Math.floor(canvas.height / 3) - 10);
+    ctx.drawImage(topTextImg, 0, 0, 208, 237, (baseWidth - 208) / 2, 20, 208, Math.floor(baseHeight / 3) - 10);
 
     // 婚礼小人由远及近
     var i = 1,
         dWidth = 15,
         dHeight = 6;
     functionIdObj.onePage = window.setInterval(function () {
-        ctx.clearRect((canvas.width - dWidth) / 2, Math.floor(canvas.height / 3), dWidth, dHeight);
+        ctx.clearRect((baseWidth - dWidth) / 2, Math.floor(baseHeight / 3), dWidth, dHeight);
         dWidth = 15 * i;
         dHeight = 5 * i;
-        ctx.drawImage(image, 55, 588, 1500, 640, (canvas.width - dWidth) / 2, Math.floor(canvas.height / 3), dWidth, dHeight);
+        ctx.drawImage(image, 55, 588, 1500, 640, (baseWidth- dWidth) / 2, Math.floor(baseHeight / 3), dWidth, dHeight);
         i++;
         if (i == 30) {
             window.clearInterval(functionIdObj.onePage);
@@ -147,7 +173,7 @@ function firstPage(canvas) {
 
     // 新郎新娘名字显示
     setTimeout(function () {
-        ctx.drawImage(image, 0, 1400, 1500, 300, (canvas.width - 465) / 2, Math.floor(canvas.height / 3) + 150, 450, 120);
+        ctx.drawImage(image, 0, 1400, 1500, 300, (baseWidth - 465) / 2, Math.floor(baseHeight / 3) + 150, 450, 120);
     }, 3500);
 
     // 婚礼时间从左侧开始显示
@@ -158,14 +184,14 @@ function firstPage(canvas) {
             sWidth: 1500,
             sHeight: 300,
             dx: -300,
-            dy: Math.floor(canvas.height / 3) + 270,
+            dy: Math.floor(baseHeight / 3) + 270,
             dWidth: 450,
             dHeight: 120,
-            targetX: (canvas.width - 480) / 2
+            targetX: (baseWidth - 480) / 2
         });
     }, 4000);
 
-    return 4000 + Math.floor(((canvas.width - 480) / 2 + 300) / 10 * 50) + rangeTimer;
+    return 4000 + Math.floor(((baseWidth - 480) / 2 + 300) / 10 * 50) + rangeTimer;
 
 }
 
@@ -184,7 +210,7 @@ function secondPage(canvas, next) {
 
 
     setTimeout(function () {
-        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+        canvas.getContext("2d").clearRect(0, 0, baseWidth, baseHeight);
         drawTopPage(canvas, imgPathArray);
     }, totalTime);
 
@@ -203,16 +229,18 @@ function secondPage(canvas, next) {
  */
 function thirdPage(canvas, bgCanvas) {
     var ctx = canvas.getContext("2d");
+//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     var bgCtx = bgCanvas.getContext("2d");
+//    bgCtx.scale(bgCanvas.width/baseWidth, bgCanvas.height/baseHeight);
 
     var textArray = ["很多人把真爱挂在嘴边", "其实 真爱更应该放在心间", "很多人把真爱", "看成脱口而出的言语",
         "其实 真爱只是一句", "无言又含蓄的心语情诗"];
 
     setTimeout(function () {
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, baseWidth, baseHeight);
 
-        var baseHeight = 0;
+        var baseMoveHeight = 0;
 
         textArray.forEach(function (text, index) {
             functionIdObj.threePage = [];
@@ -223,17 +251,17 @@ function thirdPage(canvas, bgCanvas) {
                 ctx.shadowOffsetY = 2;
                 ctx.shadowBlur = 2;
                 ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-                baseHeight = 48 * index;
+                baseMoveHeight = 48 * index;
                 ctx.font = "20px Times New Roman";
                 ctx.fillStyle = "#FFFFFF";
                 ctx.textBaseline = "bottom";
                 var moveIndex = 0;
                 functionIdObj.threePage[index] = setInterval(function () {
                     if (moveIndex > 0) {
-                        ctx.clearRect(10, canvas.height / 2 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+                        ctx.clearRect(10, baseHeight / 2 + baseMoveHeight - 48, ctx.measureText(text).width + 5, 60);
                     }
                     moveIndex++;
-                    ctx.fillText(text, 10, canvas.height / 2 + baseHeight - moveIndex);
+                    ctx.fillText(text, 10, baseHeight / 2 + baseMoveHeight - moveIndex);
                     if (moveIndex > 10) {
                         clearInterval(functionIdObj.threePage[index]);
                         ctx.restore();
@@ -245,8 +273,8 @@ function thirdPage(canvas, bgCanvas) {
         });
 
         // 绘制图片背景
-        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        bgCtx.drawImage(renImg, 0, 0, renImg.width, renImg.height, 0, 0, bgCanvas.width, bgCanvas.height);
+        bgCtx.clearRect(0, 0, baseWidth, baseHeight);
+        bgCtx.drawImage(renImg, 0, 0, renImg.width, renImg.height, 0, 0, baseWidth, baseHeight);
 
         // 从左到右绘制图片
         setTimeout(function () {
@@ -255,9 +283,9 @@ function thirdPage(canvas, bgCanvas) {
             functionIdObj.threePage1 = setInterval(function () {
                 var width = step * Math.ceil(ren2Img.width / maxStep) > ren2Img.width ? ren2Img.width : step * Math.ceil(ren2Img.width / maxStep);
                 var ix = ren2Img.width - width;
-                var sWidth = Math.floor(width * bgCanvas.width / ren2Img.width) > bgCanvas.width ? bgCanvas.width: Math.floor(width * bgCanvas.width / ren2Img.width);
-                bgCtx.clearRect(0, 0, sWidth, bgCanvas.height);
-                bgCtx.drawImage(ren2Img, ix < 0 ? 0 : ix, 0, width, ren2Img.height, 0, 0, sWidth, bgCanvas.height);
+                var sWidth = Math.floor(width * baseWidth / ren2Img.width) > baseWidth ? baseWidth: Math.floor(width * baseWidth / ren2Img.width);
+                bgCtx.clearRect(0, 0, sWidth, baseHeight);
+                bgCtx.drawImage(ren2Img, ix < 0 ? 0 : ix, 0, width, ren2Img.height, 0, 0, sWidth, baseHeight);
                 step++;
                 if (step > maxStep) {
                     clearInterval(functionIdObj.threePage1);
@@ -271,12 +299,12 @@ function thirdPage(canvas, bgCanvas) {
                     maxStep = 10;
             functionIdObj.threePage2 = setInterval(function () {
                 var width = step * ren3Img.width / maxStep;
-                var sx = bgCanvas.width - width * bgCanvas.width / ren3Img.width;
+                var sx = baseWidth - width * baseWidth / ren3Img.width;
 //                alert(sx);
                 if (sx >= 0) {
-                    bgCtx.clearRect(sx, 0, width, bgCanvas.height);
+                    bgCtx.clearRect(sx, 0, width, baseHeight);
                 }
-                bgCtx.drawImage(ren3Img, 0, 0, width, ren3Img.height, sx < 10 ? 0 : sx, 0, width * bgCanvas.width / ren3Img.width, bgCanvas.height);
+                bgCtx.drawImage(ren3Img, 0, 0, width, ren3Img.height, sx < 10 ? 0 : sx, 0, width * baseWidth / ren3Img.width, baseHeight);
                 step++;
                 if (step > maxStep) {
                     clearInterval(functionIdObj.threePage2);
@@ -289,18 +317,18 @@ function thirdPage(canvas, bgCanvas) {
 
             var step = 0,
                     maxStep = 100;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, baseWidth, baseHeight);
 
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            bgCtx.drawImage(bgImg, 0, 0, bgCanvas.width, bgCanvas.height);
+            bgCtx.clearRect(0, 0, baseWidth, baseHeight);
+            bgCtx.drawImage(bgImg, 0, 0, baseWidth, baseHeight);
 
-            ctx.drawImage(ren3Img, 0, 0, ren3Img.width, ren3Img.height, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(ren3Img, 0, 0, ren3Img.width, ren3Img.height, 0, 0, baseWidth, baseHeight);
 
             functionIdObj.threePage3 = setInterval(function () {
-                var unitHeight = Math.ceil(canvas.height / maxStep),
+                var unitHeight = Math.ceil(baseHeight / maxStep),
                         height = step * unitHeight;
 
-                ctx.clearRect(0, canvas.height - height, canvas.width, unitHeight + 1);
+                ctx.clearRect(0, baseHeight - height, baseWidth, unitHeight + 1);
                 step++;
                 if (step > maxStep) {
                     clearInterval(functionIdObj.threePage3);
@@ -322,6 +350,7 @@ function thirdPage(canvas, bgCanvas) {
  */
 function fourthPage(canvas, bgCanvas, totalTime) {
     var ctx = canvas.getContext("2d");
+//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
 //    var bgCtx = bgCanvas.getContext("2d");
 
     // 由大变小再抖动
@@ -330,33 +359,33 @@ function fourthPage(canvas, bgCanvas, totalTime) {
             maxStep = 10;
         functionIdObj.fourPage1 = setInterval(function () {
             ctx.save();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.translate(-canvas.width * 0.5 * (1 - step/10), -canvas.height * 0.5 *  (1 - step/10));
-            ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width * (2 - step/10), canvas.height * (2 - step/10));
+            ctx.clearRect(0, 0, baseWidth, baseHeight);
+            ctx.translate(-baseWidth * 0.5 * (1 - step/10), -baseHeight * 0.5 *  (1 - step/10));
+            ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth * (2 - step/10), baseHeight * (2 - step/10));
             ctx.restore();
             step++;
             if (step == maxStep) {
                 clearInterval(functionIdObj.fourPage1);
 //                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width, canvas.height);
                 ctx.save();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, baseWidth, baseHeight);
                 ctx.translate(10, 10);
-                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width-20, canvas.height-20);
+                ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth-20, baseHeight-20);
                 ctx.restore();
                 setTimeout(function(){
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width, canvas.height);
+                    ctx.clearRect(0, 0, baseWidth, baseHeight);
+                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth, baseHeight);
                 }, 500);
                 setTimeout(function(){
                     ctx.save();
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.clearRect(0, 0, baseWidth, baseHeight);
                     ctx.translate(10, 10);
-                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width-20, canvas.height-20);
+                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth-20, baseHeight-20);
                     ctx.restore();
                 }, 1000);
                 setTimeout(function(){
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, canvas.width, canvas.height);
+                    ctx.clearRect(0, 0, baseWidth, baseHeight);
+                    ctx.drawImage(ren4Img, 0, 0, ren4Img.width, ren4Img.height, 0, 0, baseWidth, baseHeight);
                 }, 1500);
             }
         }, 50);
@@ -411,16 +440,37 @@ function fourthPage(canvas, bgCanvas, totalTime) {
  *
  */
 function fifthPage(canvas, bgCanvas) {
-    var ctx = canvas.getContext("2d");
+    var ctx = canvas.getContext("2d"),
+        bgCtx = bgCanvas.getContext("2d");
+
+//        ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
+//        bgCtx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     var text1Array = ["We are married", "真诚期待您的光临", "您一定不能错过这场温馨浪漫的婚礼", "见证美丽的公主说出那句", "Yes I Do"];
     setTimeout(function () {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(ren5Img, 0, 0, ren5Img.width, ren5Img.height, 0, 0, canvas.width, canvas.width*0.6);
+        ctx.clearRect(0, 0, baseWidth, baseHeight);
+        ctx.drawImage(ren5Img, 0, 0, ren5Img.width, ren5Img.height, 0, 0, baseWidth, baseWidth*0.6);
+
+
 
         text1Array.forEach(function (text, index) {
 
             if (index == 0) {
                 setTimeout(function () {
+                    // 绘制圆型渐近背景
+                    var rGrd =ctx.createRadialGradient(baseWidth/2, baseWidth*0.3, 50, baseWidth/2, baseWidth*0.3, baseWidth*0.4);
+                    rGrd.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                    rGrd.addColorStop(0.2, 'rgba(255, 255, 255, 0.2)');
+                    rGrd.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)');
+                    rGrd.addColorStop(0.6, 'rgba(255, 255, 255, 0.6)');
+                    rGrd.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
+                    rGrd.addColorStop(1, 'rgba(255, 255, 255, 1)');
+                    //        rGrd.addColorStop(0.4, '#FFC125');
+                    //        rGrd.addColorStop(0.6, '#FF7F00');
+                    //        rGrd.addColorStop(0.8, '#FF0000');
+                    //        rGrd.addColorStop(1, '#EE0000');
+                    ctx.fillStyle = rGrd;
+                    //        ctx.globalAlpha = 0.5;
+                    ctx.fillRect(0, 0, baseWidth, baseWidth*0.6);
                     ctx.save();
                     ctx.font = "bold 42px Helvetica";
                     ctx.shadowOffsetX = 5;
@@ -429,42 +479,62 @@ function fifthPage(canvas, bgCanvas) {
                     ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
                     // ctx.font = "20px Times New Roman";
-                    ctx.fillStyle = "#ADFF2F";
+                    ctx.fillStyle = "#FFE7BA";
                     ctx.textBaseline = "bottom";
 
                     // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
 
-                    ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 50 + 25 * (index == 0 ? index : index + 1));
+                    ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, Math.floor(baseHeight / 3) + 50 + 25 * (index == 0 ? index : index + 1));
                     ctx.restore();
 
                 }, timer * index);
             } else if (index == text1Array.length - 1) {
                 setTimeout(function () {
-                    ctx.save();
-                    ctx.font = "bold 60px Helvetica ";
-//                    ctx.shadowOffsetX = 10;
-//                    ctx.shadowOffsetY = 10;
-//                    ctx.shadowBlur = 10;
-//                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-                    ctx.shadowColor = "#F0FFFF";
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                    ctx.shadowBlur = 15;
-                    ctx.fillStyle = "#FFFFFF";
-//                    ctx.fillText("Blur Canvas", 40, 80);
+                    // 绘制圆型渐近背景
+//                    var rGrd =bgCtx.createRadialGradient(canvas.width/2, (canvas.height - canvas.width*0.6)/2 + canvas.width*0.6, 50, canvas.width/2, (canvas.height - canvas.width*0.6)/2 + canvas.width*0.6, canvas.width*0.8);
+//                    rGrd.addColorStop(0, '#FFFFFF');
+//                    rGrd.addColorStop(0.2, '#FFEC8B');
+//                    rGrd.addColorStop(0.4, '#FFC125');
+//                    rGrd.addColorStop(0.6, '#FF7F00');
+//                    rGrd.addColorStop(0.8, '#FF0000');
+//                    rGrd.addColorStop(1, '#EE0000');
+//                    bgCtx.fillStyle = rGrd;
+//                    bgCtx.globalAlpha = 0.5;
+//                    repeatImg(bgCanvas, heartImage, {}, function(bgCtxr){
+//                        bgCtxr.fillRect(0, Math.floor(canvas.height / 3) + 25 * (index == 0 ? index : index + 1), canvas.width, 200);
+//                    });
 
+//                    position:absolute;left:0;top:0;z-index:3
 
-//                    // ctx.font = "20px Times New Roman";
-//                    ctx.fillStyle = "#EE00EE";
-//                    ctx.textBaseline = "bottom";
+                    $("#heart").show().css("position", "absolute").css("top", (baseHeight - 188)/2 + 90)
+                            .css("left", 0).css("z-index", "4");
 
-                    // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
-
-                    ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
-                    ctx.strokeStyle = "#FF0000";
-                    ctx.lineWidth = 4;
-                    ctx.strokeText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
-                    ctx.restore();
+                    ctx.drawImage(yesidoImg, 0, 0, 360, 188, (baseWidth - 180) / 2, (baseHeight - 188)/2 + 90, 180, 188);
+//                    ctx.save();
+//                    ctx.font = "bold 60px Helvetica ";
+////                    ctx.shadowOffsetX = 10;
+////                    ctx.shadowOffsetY = 10;
+////                    ctx.shadowBlur = 10;
+////                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+//                    ctx.shadowColor = "#F0FFFF";
+//                    ctx.shadowOffsetX = 0;
+//                    ctx.shadowOffsetY = 0;
+//                    ctx.shadowBlur = 15;
+//                    ctx.fillStyle = "#FFFFFF";
+////                    ctx.fillText("Blur Canvas", 40, 80);
+//
+//
+////                    // ctx.font = "20px Times New Roman";
+////                    ctx.fillStyle = "#EE00EE";
+////                    ctx.textBaseline = "bottom";
+//
+//                    // ctx.clearRect(10, 420 + baseHeight - 48, ctx.measureText(text).width + 5, 60);
+//
+//                    ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
+//                    ctx.strokeStyle = "#FF0000";
+//                    ctx.lineWidth = 4;
+//                    ctx.strokeText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 100 + 25 * (index == 0 ? index : index + 1));
+//                    ctx.restore();
 
                 }, timer * index);
             } else {
@@ -478,11 +548,11 @@ function fifthPage(canvas, bgCanvas) {
                         ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
                         ctx.font = "bold 20px 宋体";
-                        ctx.fillStyle = "#436EEE";
+                        ctx.fillStyle = "#EE799F";
                         ctx.textBaseline = "bottom";
 
 
-                        ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, Math.floor(canvas.height / 3) + 50 + 25 * index);
+                        ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, Math.floor(baseHeight / 3) + 50 + 25 * index);
                         ctx.restore();
                     }
 
@@ -499,21 +569,53 @@ function fifthPage(canvas, bgCanvas) {
                 ctx.font = "bold 20px 宋体";
                 ctx.fillStyle = "#000000";
                 ctx.textBaseline = "bottom";
-                ctx.fillText(text, (canvas.width - ctx.measureText(text).width) / 2, canvas.height - 10 -  (addressArray.length - index) * 25);
+                ctx.fillText(text, (baseWidth - ctx.measureText(text).width) / 2, baseHeight - 10 -  (addressArray.length - index) * 25);
                 ctx.restore();
             })
         }, timer * (text1Array.length + 3));
     }, totalTime);
 
     // 切换信息录入页面
-//    setTimeout(function () {
+    setTimeout(function () {
+
+        $("#canvasDiv").hide();
+        $("#heart").hide()
+
+        $("#formDiv").show().height(window.innerHeight);
+
+        $("#form").submit(function(e){
+            var data = $("#form").serializeArray();
+
+            var frameForm = $('<form>', {
+                id: 'frameForm',
+                action:'http://52.11.24.238:8081/',
+                method:'POST'
+            });
+
+            $("#form").find('input[type="text"]').each(function(index, text){
+                frameForm.append(text);
+            })
+
+            $(document.getElementById("frame").contentWindow.document.body).append(frameForm);
+//            $("#frameName").val(data[0].value);
+            $(document.getElementById("frame").contentWindow.document.body).find("#frameForm").submit();
+
+//           $.get('http://52.11.24.238:8081/',$("#form").serialize(), function(result){
+//              console.log(result);
 //
-//        $("#canvasDiv").hide();
-//
-//        $("#form").show().height(window.innerHeight);
-//
-//
-//    }, totalTime + 30000);
+//           }, function(error) {
+//               console.log(error);
+//           });
+           e.stopPropagation();
+           e.preventDefault();
+           $("#form").hide();
+           $("#result").show();
+           return false;
+        });
+
+
+
+    }, totalTime + 30000);
 
     return 15000;
 }
@@ -521,6 +623,7 @@ function fifthPage(canvas, bgCanvas) {
 function drawTopPage(canvas, imgPathArray) {
     // 得到2d效果内容
     var ctx = canvas.getContext("2d");
+//    ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
     var beginHeight = 55;
     // 设定图片描画相关信息
     var baseOptions = {
@@ -528,14 +631,14 @@ function drawTopPage(canvas, imgPathArray) {
         sy: 10,
         sWidth: 100,
         sHeight: 100,
-        dx: Math.floor((canvas.width - 100) / 2),
-        dy: Math.floor((canvas.height - 100) / 2),
-        dWidth: Math.floor((canvas.height - beginHeight) * 2 / imgPathArray.length),
-        dHeight: Math.floor((canvas.height - beginHeight) * 2 / imgPathArray.length)
+        dx: Math.floor((baseWidth - 100) / 2),
+        dy: Math.floor((baseHeight - 100) / 2),
+        dWidth: Math.floor((baseWidth - beginHeight) * 2 / imgPathArray.length),
+        dHeight: Math.floor((baseHeight - beginHeight) * 2 / imgPathArray.length)
     };
 
-    var leftDx = Math.floor((canvas.width / 2 - baseOptions.dWidth) / 2),
-        rightDx = leftDx + canvas.width / 2;
+    var leftDx = Math.floor((baseWidth / 2 - baseOptions.dWidth) / 2),
+        rightDx = leftDx + baseWidth / 2;
 
     ctx.font = "bold 36px Times New Roman";
     ctx.fillText("WE", 35, 60);
@@ -598,7 +701,7 @@ function setBgCanvas(canvas) {
     // 得到2d效果内容
     var ctx = canvas.getContext("2d");
     ctx.globalAlpha = 0.5;
-    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bgImg, 0, 0, baseWidth, baseHeight);
 }
 
 /**
@@ -615,7 +718,10 @@ function setFullScreen() {
             //浏览器窗口大小变化时，回调函数
             $(canvas).attr("width", $(window).get(0).innerWidth);
             $(canvas).attr("height", $(window).get(0).innerHeight);
+            var ctx = canvas.getContext("2d");
+            ctx.scale(canvas.width/baseWidth, canvas.height/baseHeight);
         });
+        setBgCanvas(canvasAry[canvasAry.length-1]);
 
     };
     resizeCanvas();
@@ -650,6 +756,39 @@ function flyFormLeft(canvas, image, options) {
     }, 50);
 }
 
+function repeatImg(canvas, img, options, callback) {
+    var defaultOptions = {
+        sx:0,
+        sy:0,
+        sWidth:img.width,
+        sHeight:img.height,
+        dx:0,
+        dy:0,
+        dWidth:100,
+        dHeight:100
+    };
+    var op = $.extend({}, defaultOptions, options);
+    var tpl = '<canvas id="tmpCanvas" style="display:none;"></canvas>';
+    $(document.body).append(tpl);
+    var cw = $('#tmpCanvas')[0];
+    cw.width = op.dWidth;
+    cw.height = op.dHeight;
+    var ctx = cw.getContext("2d");
+    // ctx.clearRect(0,0,100,100);
+    ctx.drawImage(img, op.sx, op.sy, op.sWidth, op.sHeight, op.dx, op.dy, op.dWidth, op.dHeight);
+    $('#tmpCanvas').remove();
+    var ctxr = canvas.getContext("2d");
+    // ctxr.clearRect(0,0,canvas.width,canvas.height);  //清除整个画布
+    var pat = ctxr.createPattern(cw, "repeat");    //在指定的方向上重复指定的元素
+    ctxr.fillStyle = pat;
+    if (!callback) {
+        ctxr.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+        callback(ctxr);
+    }
+
+}
+
 
 
 
@@ -659,12 +798,14 @@ function flyFormLeft(canvas, image, options) {
 <div style='margin:0 auto;width:0px;height:0px;overflow:hidden;'>
     <img id="logo" src="../static/images/logo.jpg"/>
 </div>
+<img id="start" style="position:fixed; top:2px; right:2px; z-index:4" src="data:image/png;base64,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" />
+<img id="mute" style="position:fixed; top:2px; right:2px; z-index:4; display:none" src="data:image/png;base64,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" />
 <!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
     your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<audio  autoplay="autoplay" controls="controls" preload="auto" src="http://sh.ctfs.ftn.qq.com/ftn_handler/f465c1f22f3a5bead8c2a7cdca931be951f14d16765ea65bf43dfe1d259f49e7efe6c48c718cc5659ddeec4fd8e27b4e8b2dee905bc485ddad84d9af857f42c1/?fname=jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>
+<audio id="audio" autoplay="autoplay" controls="controls" preload="auto" src="http://sh.ctfs.ftn.qq.com/ftn_handler/f465c1f22f3a5bead8c2a7cdca931be951f14d16765ea65bf43dfe1d259f49e7efe6c48c718cc5659ddeec4fd8e27b4e8b2dee905bc485ddad84d9af857f42c1/?fname=jiepi.mp3" style="display:none">*你的浏览器不支持audio标签</audio>
 
 <div id="canvasDiv" style="position:relative">
     <canvas id="myCanvas" width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:3">
@@ -674,20 +815,23 @@ function flyFormLeft(canvas, image, options) {
 
     </canvas>
 </div>
-<div id="form" width="100%"
+<div id="formDiv" width="100%"
      style="display:none; height:100%;text-align:center; background-image: url(../static/images/flower.jpg);">
     <div style="width:100% ;height:30px"></div>
     <div id="head" class="container"></div>
-    <form action="http://52.11.24.238:8081/" method="post">
+    <div id="result" style="display:none">
+        <h1>期待您的光临</h1>
+    </div>
+    <form id="form" method="post">
         <h2 style="margin-top:0px; padding:10px;padding-top:30px">欢迎光临我们的婚礼</h2>
-        <input type="text" name="name" placeholder="姓名" class="mytxt"/><br>
-        <input type="text" name="phone" placeholder="电话" class="mytxt"/><br>
-        <input type="text" name="count" placeholder="人数" class="mytxt"/><br>
-        <input type="text" name="comment" placeholder="留言" class="mytxt"/><br>
+        <input type="text" name="name" placeholder="姓名" class="mytxt" maxLength="10"/><br>
+        <input type="text" name="phone" placeholder="电话" class="mytxt" maxLength="10"/><br>
+        <input type="text" name="count" placeholder="人数" class="mytxt" maxLength="10"/><br>
+        <input type="text" name="comment" placeholder="留言" class="mytxt" maxLength="100"/><br>
         <input type="submit" value="提交" class="mybtn"/>
     </form>
     <br>
-    <a href="/">再看一遍</a>
+    <!--<a href="/">再看一遍</a>-->
 </div>
 <img id="line1" src="../static/images/20160216line-16.png" style="display:none"/>
 <img id="bg1" src="../static/images/flower.jpg" style="display:none"/>
@@ -698,5 +842,9 @@ function flyFormLeft(canvas, image, options) {
 <img id="ren4" src="https://ooo.0o0.ooo/2016/04/03/57014713bd4ae.jpg" style="display:none"/>
 <img id="ren5" src="https://ooo.0o0.ooo/2016/04/03/570146288b9e1.jpg" style="display:none"/>
 <img id="top" src="../static/images/top_without_bg.png" style="display:none"/>
+<img id="yesido" src="../static/images/yesido.png" style="display:none"/>
+<img id="heart" src="../static/images/quan.png" style="display:none;width:100%"/>
 </body>
 </html>
+<iframe id="frame" style="display:none;">
+</iframe>

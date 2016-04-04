@@ -158,13 +158,13 @@ function firstPage(canvas) {
 
     // 婚礼小人由远及近
     var i = 1,
-        dWidth = 15,
+        dWidth = 14,
         dHeight = 6;
     functionIdObj.onePage = window.setInterval(function () {
         ctx.clearRect((baseWidth - dWidth) / 2, Math.floor(baseHeight / 3), dWidth, dHeight);
-        dWidth = 15 * i;
+        dWidth = 14 * i;
         dHeight = 5 * i;
-        ctx.drawImage(image, 55, 588, 1500, 640, (baseWidth- dWidth) / 2, Math.floor(baseHeight / 3), dWidth, dHeight);
+        ctx.drawImage(image, 55, 588, 1500, 640, (baseWidth - dWidth) / 2, Math.floor(baseHeight / 3), dWidth, dHeight);
         i++;
         if (i == 30) {
             window.clearInterval(functionIdObj.onePage);
@@ -584,33 +584,29 @@ function fifthPage(canvas, bgCanvas) {
         $("#formDiv").show().height(window.innerHeight);
 
         $("#form").submit(function(e){
-            var data = $("#form").serializeArray();
+//            var data = $("#form").serializeArray();
 
-            var frameForm = $('<form>', {
-                id: 'frameForm',
-                action:'http://52.11.24.238:8081/',
-                method:'POST'
-            });
-
-            $("#form").find('input[type="text"]').each(function(index, text){
-                frameForm.append(text);
-            });
-
-            $(document.getElementById("frame").contentWindow.document.body).append(frameForm);
-//            $("#frameName").val(data[0].value);
-            $(document.getElementById("frame").contentWindow.document.body).find("#frameForm").submit();
-
-//           $.get('http://52.11.24.238:8081/',$("#form").serialize(), function(result){
-//              console.log(result);
+//            var frameForm = $('<form>', {
+//                id: 'frameForm',
+//                action:'http://52.11.24.238:8081/',
+//                method:'POST'
+//            });
+////            alert(frameForm);
 //
-//           }, function(error) {
-//               console.log(error);
-//           });
-           e.stopPropagation();
-           e.preventDefault();
+//            $("#form").find('input[type="text"]').each(function(index, text){
+//                frameForm.append(text);
+//            });
+////            alert(frameForm.find('input[type="text"]').length);
+//            $(document.getElementById("frame").contentWindow.document.body).append(frameForm);
+////            $("#frameName").val(data[0].value);
+//            alert($(document.getElementById("frame").contentWindow.document.body).find("#frameForm").attr("action"));
+//            $(document.getElementById("frame").contentWindow.document.body).find("#frameForm").submit();
+//
+//           e.stopPropagation();
+//           e.preventDefault();
            $("#form").hide();
            $("#result").show();
-           return false;
+//           return false;
         });
 
 
@@ -633,8 +629,8 @@ function drawTopPage(canvas, imgPathArray) {
         sHeight: 100,
         dx: Math.floor((baseWidth - 100) / 2),
         dy: Math.floor((baseHeight - 100) / 2),
-        dWidth: Math.floor((baseWidth - beginHeight) * 2 / imgPathArray.length),
-        dHeight: Math.floor((baseHeight - beginHeight) * 2 / imgPathArray.length)
+        dWidth: 100,
+        dHeight: 100
     };
 
     var leftDx = Math.floor((baseWidth / 2 - baseOptions.dWidth) / 2),
@@ -822,7 +818,7 @@ function repeatImg(canvas, img, options, callback) {
     <div id="result" style="display:none">
         <h1>期待您的光临</h1>
     </div>
-    <form id="form" method="post">
+    <form id="form" action="http://52.11.24.238:8081/" method="post" target="frame">
         <h2 style="margin-top:0px; padding:10px;padding-top:30px">欢迎光临我们的婚礼</h2>
         <input type="text" name="name" placeholder="姓名" class="mytxt" maxLength="10"/><br>
         <input type="text" name="phone" placeholder="电话" class="mytxt" maxLength="11"/><br>
@@ -841,7 +837,7 @@ function repeatImg(canvas, img, options, callback) {
 <img id="ren3" src="https://ooo.0o0.ooo/2016/04/03/570147401fbc9.jpg" style="display:none"/>
 <img id="ren4" src="https://ooo.0o0.ooo/2016/04/03/57014713bd4ae.jpg" style="display:none"/>
 <img id="ren5" src="https://ooo.0o0.ooo/2016/04/03/570146288b9e1.jpg" style="display:none"/>
-<img id="top" src="https://ooo.0o0.ooo/2016/04/04/5702309460646.png" style="display:none"/>
+<img id="top" src="../static/images/top_without_bg.png" style="display:none"/>
 <img id="yesido" src="https://ooo.0o0.ooo/2016/04/04/570230871f9cd.png" style="display:none"/>
 <img id="heart" src="https://ooo.0o0.ooo/2016/04/04/57023091e331a.png" style="display:none;width:100%"/>
 </body>

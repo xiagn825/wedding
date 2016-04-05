@@ -13,7 +13,8 @@
 
 </style>
 
-<script src="../static/bower_components/jquery/dist/jquery.min.js"></script>
+<!--<script src="../static/bower_components/jquery/dist/jquery.min.js"></script>-->
+<script src="//cdn.bootcss.com/zepto/1.0rc1/zepto.min.js"></script>
 <script type="text/javascript">
 
 // TODO 合并，全局场景参数
@@ -36,6 +37,10 @@ var timer = 1500,
 // 动画总时长
 var totalTime = 0;
 
+
+document.addEventListener('touchmove', function (event) {
+    event.preventDefault();
+}, false);
 
 $(document).ready(function () {
 
@@ -75,7 +80,7 @@ function invitation() {
 // 下一页控制
 function next() {
     var nextIcon = $("#next");
-    nextIcon.click(function() {
+    nextIcon.swipeUp(function() {
         var once = false;
         exeQueue.forEach(function(exec, index){
             if (!exec && !once) {
@@ -95,7 +100,7 @@ function nextIconMove(nextIcon) {
     var range = 0,
         offset = 0;
     setInterval(function(){
-        var position = nextIcon.position();
+        var position = nextIcon.offset();
         if (offset == -20) {
             range = 2;
         } else if (offset == 0){
@@ -577,13 +582,13 @@ function fifthPage(next) {
             }, timer * index);
         } else if (index == text1Array.length - 1) {
             setTimeout(function () {
-                if ($("fifthPage:visible").length == 0) {
+                ctx.drawImage(yesidoImg, 0, 0, 360, 188, (baseWidth - 180) / 2, (baseHeight - 188)/2 + 90, 180, 188);
+                if ($("#fifthPage").css("display") == "none"
+                        || $("#fifthPage").parent("div").css("display") == "none") {
                     return;
                 }
                 $("#heart").show().css("position", "absolute").css("top", (baseHeight - 188)/2 + 90)
                         .css("left", 0).css("z-index", "4");
-
-                ctx.drawImage(yesidoImg, 0, 0, 360, 188, (baseWidth - 180) / 2, (baseHeight - 188)/2 + 90, 180, 188);
 
             }, timer * index);
         } else {
@@ -609,7 +614,7 @@ function fifthPage(next) {
         }
     });
 
-    var addressArray = ["2016年5月2号 星期一 10:00", "席社:大连香洲花园 百合厅", "地址:大连市西岗区长春路171号","(位于体育场附近)"];
+    var addressArray = ["2016年5月2号 星期一 10:00", "席社:大连香洲花园 百合厅", "地址:大连市西岗区长春路171号","(位于原体育场附近)"];
 
     setTimeout(function () {
         addressArray.forEach(function (text, index) {
@@ -634,10 +639,9 @@ function endPage() {
 
     $("#formDiv").show().height(window.innerHeight);
 
-    $("#form").submit(function(e){
+    $(".mybtn").click(function(e){
         $("#form").hide();
         $("#result").show();
-        return true;
     });
 }
 
@@ -876,7 +880,9 @@ function flyFormLeft(canvas, image, options) {
 <img id="top" src="../static/images/top_without_bg.png" style="display:none"/>
 <img id="yesido" src="https://ooo.0o0.ooo/2016/04/04/570230871f9cd.png" style="display:none"/>
 <img id="heart" src="https://ooo.0o0.ooo/2016/04/04/57023091e331a.png" style="display:none;width:100%"/>
-<img id="next" style="z-index:4; position:fixed; bottom:10px; left:45%;width:35px" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAkCAMAAADip6m2AAAAolBMVEUAAAAAAAAAAAAAAAAAAAABAQEAAAAAAAAHBwcAAAD////9/f37+/vt7e25ubn39/cKCgrz8/Pe3t7c3Nz+/v729vbW1tZra2tKSkoAAABpaWlgYGD9/f38/Pz5+fn5+fn39/fz8/Px8fHu7u7q6urm5ubj4+Pd3d3y8vLX19fJycnAwMC4uLisrKyhoaGVlZWGhoajo6MpKSkxMTGAgID///9oDYyzAAAANXRSTlMAAwcLFR0SGRAO+efJbSOcIqBDQvLNbTEpGxEQ9e3h29XDvLOsnJOJiIFpYVlNRkE7MiwfDLl52bwAAAGFSURBVEjH3ZXZboMwFERbHAMhC6EFQtrs+777/3+t98bGjmwqy32plHmLPYfMiYTy9nJ5F/kb693j+O4h7Y567SZjzbYHuDv72WCQxgfSjixpReyRqEWAdmK/YyaTfAHtpivjIo6TUReTZYxxcZzupju/XufP4g660aYD2USmuF13sKeP7Ae6uF13fKZBDRLQ81gTt+rOCmD9MPSBLmaauEV3hWidQOqIr57FLbrpDllCPAghSO9SU7xad3QCNiRQgwAeAn0a6eLVutOC4mRk+SCcToupIW7qsmWnByw25B3Svc6SaeKGbn9LA8UqGsW3fVMc2VJ3eJS6apcUPw5LcVmAq1J30qWBL1mN9gPanZTiUBE3pe5C6cpo4gtRjXkJjtf8cbnSlTHEcz5yTTwBh00UOVToVogfGvibhQq+pCyr0q0Wz1h6kTDsyZObPvn36bckh6qA8YE1eIUEa6GxyyeKEzhC1MLy6byL3yNP4BNn7TSWVRffHYHaI7qq7PB3qMr/mh8s20b2bOZlXQAAAABJRU5ErkJggg=="/>
+<div id="next" style="z-index:4; position:fixed; bottom:10px; left:0; width:100%;text-align: center" >
+<img id="next" style="width:35px" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAkCAMAAADip6m2AAAAolBMVEUAAAAAAAAAAAAAAAAAAAABAQEAAAAAAAAHBwcAAAD////9/f37+/vt7e25ubn39/cKCgrz8/Pe3t7c3Nz+/v729vbW1tZra2tKSkoAAABpaWlgYGD9/f38/Pz5+fn5+fn39/fz8/Px8fHu7u7q6urm5ubj4+Pd3d3y8vLX19fJycnAwMC4uLisrKyhoaGVlZWGhoajo6MpKSkxMTGAgID///9oDYyzAAAANXRSTlMAAwcLFR0SGRAO+efJbSOcIqBDQvLNbTEpGxEQ9e3h29XDvLOsnJOJiIFpYVlNRkE7MiwfDLl52bwAAAGFSURBVEjH3ZXZboMwFERbHAMhC6EFQtrs+777/3+t98bGjmwqy32plHmLPYfMiYTy9nJ5F/kb693j+O4h7Y567SZjzbYHuDv72WCQxgfSjixpReyRqEWAdmK/YyaTfAHtpivjIo6TUReTZYxxcZzupju/XufP4g660aYD2USmuF13sKeP7Ae6uF13fKZBDRLQ81gTt+rOCmD9MPSBLmaauEV3hWidQOqIr57FLbrpDllCPAghSO9SU7xad3QCNiRQgwAeAn0a6eLVutOC4mRk+SCcToupIW7qsmWnByw25B3Svc6SaeKGbn9LA8UqGsW3fVMc2VJ3eJS6apcUPw5LcVmAq1J30qWBL1mN9gPanZTiUBE3pe5C6cpo4gtRjXkJjtf8cbnSlTHEcz5yTTwBh00UOVToVogfGvibhQq+pCyr0q0Wz1h6kTDsyZObPvn36bckh6qA8YE1eIUEa6GxyyeKEzhC1MLy6byL3yNP4BNn7TSWVRffHYHaI7qq7PB3qMr/mh8s20b2bOZlXQAAAABJRU5ErkJggg=="/>
+</div>
 </body>
 </html>
 <iframe id="frame" style="display:none;">

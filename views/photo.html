@@ -64,7 +64,9 @@ $(document).ready(function () {
 
     $("input").focus(function(){
 //        console.log($(this).offset().top);
-        $(window).scrollTop($(this).offset().top);
+        if ($(window).scrollTop) {
+            $(window).scrollTop($(this).offset().top);
+        }
     });
 
 });
@@ -857,6 +859,12 @@ function flyFormLeft(canvas, image, options) {
     <div id="head" class="container"></div>
     <div id="result" style="display:none">
         <h1>期待您的光临</h1>
+        <br>
+        <br>
+        <p>2016年5月2号 星期一 10:00</p>
+        <p>席社:大连香洲花园 百合厅</p>
+        <p>地址:大连市西岗区长春路171号</p>
+        <p>位于原体育场附近</p>
     </div>
     <form id="form" action="http://52.11.24.238:8081/" method="post" target="frame">
         <h2 style="margin-top:0px; padding:10px;padding-top:30px">欢迎光临我们的婚礼</h2>
